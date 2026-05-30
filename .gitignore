@@ -26,3 +26,12 @@ dist-ssr
 
 # Environment variables (DO NOT COMMIT)
 .env
+
+# Agent directories
+.agent/
+.agents/
+
+# Temporary directories and caches
+.temp/
+supabase/.temp/
+.eslintcache
