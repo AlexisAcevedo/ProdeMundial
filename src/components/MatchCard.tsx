@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Match, Prediction } from '../lib/types';
 import 'flag-icons/css/flag-icons.min.css';
 import { getTeamFlagCode } from '../lib/teamFlags';
+import { CountdownTimer } from './CountdownTimer';
 
 export function TeamFlag({ teamName, className = '' }: { teamName: string; className?: string }) {
   const code = getTeamFlagCode(teamName);
@@ -64,9 +65,13 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           {formatter.format(new Date(match.kickoff_time))}
         </span>
-        <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${isFinished ? 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border border-slate-200 dark:border-white/5' : 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 border border-brand-200 dark:border-brand-800/50'}`}>
-          {isFinished ? 'Finalizado' : 'Próximo'}
-        </span>
+        {isFinished ? (
+          <span className="rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border border-slate-200 dark:border-white/5">
+            Finalizado
+          </span>
+        ) : (
+          <CountdownTimer targetDate={cutoffTime} />
+        )}
       </div>
 
       <div className="mb-6 flex items-center justify-between gap-3 relative z-10">

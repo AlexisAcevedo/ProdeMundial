@@ -7,6 +7,8 @@ import { useTheme } from '../hooks/useTheme';
 import { MatchTabs } from '../components/MatchTabs';
 import { LeagueDetails } from '../components/LeagueDetails';
 import type { League } from '../lib/types';
+import { usePendingPredictions } from '../hooks/usePendingPredictions';
+import { PendingBadge } from '../components/PendingBadge';
 
 export function Dashboard() {
   const { user, signOut } = useAuth();
@@ -20,6 +22,9 @@ export function Dashboard() {
   const [newLeagueName, setNewLeagueName] = useState('');
   const [createLeagueError, setCreateLeagueError] = useState('');
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'groups' | 'bracket' | 'ranking' | 'pending'>('groups');
+
+  const { pendingCount } = usePendingPredictions(matches, predictions);
 
   const handleJoinLeague = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +86,10 @@ export function Dashboard() {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
               )}
             </button>
-            <span className="hidden text-sm sm:inline text-slate-500 dark:text-slate-400">{user?.email}</span>
+            <div className="flex items-center gap-2">
+              <span className="hidden text-sm sm:inline text-slate-500 dark:text-slate-400">{user?.email}</span>
+              <PendingBadge count={pendingCount} />
+            </div>
             <button 
               onClick={signOut}
               className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:bg-slate-200 active:scale-95 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10"
@@ -102,10 +110,31 @@ export function Dashboard() {
               <svg className="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
               Partidos
             </h2>
+            
+            {pendingCount > 0 && activeTab !== 'pending' && (
+              <div className="mb-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 flex items-center justify-between gap-4 backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl animate-pulse">⚡</span>
+                  <div>
+                    <h4 className="font-bold text-amber-800 dark:text-amber-400">Tenés pronósticos pendientes</h4>
+                    <p className="text-xs text-amber-700/80 dark:text-amber-300/80">Te quedan {pendingCount} {pendingCount === 1 ? 'partido' : 'partidos'} por pronosticar.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setActiveTab('pending')}
+                  className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white px-4 py-2 text-xs font-bold shadow-sm transition-all"
+                >
+                  Pronosticar ahora
+                </button>
+              </div>
+            )}
+
             <MatchTabs
               matches={matches}
               predictions={predictions}
               onSubmit={submitPrediction}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
             />
           </div>
 

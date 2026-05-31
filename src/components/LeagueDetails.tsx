@@ -1,5 +1,6 @@
 import { useLeagueStandings } from '../hooks/useLeagueStandings';
 import type { League } from '../lib/types';
+import { ShareLeague } from './ShareLeague';
 
 interface LeagueDetailsProps {
   league: League;
@@ -22,8 +23,11 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
         </button>
         <div>
           <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{league.name}</h2>
-          <div className="mt-1 inline-flex items-center gap-2 rounded-lg bg-slate-100 dark:bg-white/5 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/5">
-            Código de invitación: <span className="font-mono font-bold text-brand-600 dark:text-brand-400 text-sm tracking-wider">{league.invite_code}</span>
+          <div className="flex flex-col gap-2 mt-1">
+            <div className="self-start inline-flex items-center gap-2 rounded-lg bg-slate-100 dark:bg-white/5 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/5">
+              Código de invitación: <span className="font-mono font-bold text-brand-600 dark:text-brand-400 text-sm tracking-wider">{league.invite_code}</span>
+            </div>
+            <ShareLeague inviteCode={league.invite_code} leagueName={league.name} />
           </div>
         </div>
       </div>
