@@ -4,6 +4,14 @@ import { useMatches } from '../hooks/useMatches';
 import { usePredictions } from '../hooks/usePredictions';
 import { useLeagues } from '../hooks/useLeagues';
 import type { Match, Prediction } from '../lib/types';
+import 'flag-icons/css/flag-icons.min.css';
+import { getTeamFlagCode } from '../lib/teamFlags';
+
+function TeamFlag({ teamName, className = '' }: { teamName: string; className?: string }) {
+  const code = getTeamFlagCode(teamName);
+  if (!code) return null;
+  return <span className={`fi fi-${code} shrink-0 shadow-sm rounded-[2px] ${className}`} style={{ width: '1.25em', height: '0.9375em' }} />;
+}
 
 function MatchCard({ match, prediction, onSubmit }: { match: Match, prediction?: Prediction, onSubmit: (matchId: string, home: number, away: number) => Promise<void> }) {
   const [homeScore, setHomeScore] = useState<string>(prediction?.home_score?.toString() ?? '');
@@ -51,7 +59,7 @@ function MatchCard({ match, prediction, onSubmit }: { match: Match, prediction?:
   });
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800">
+    <div className="flex flex-col h-full rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800">
       <div className="mb-4 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
         <span>{formatter.format(new Date(match.kickoff_time))}</span>
         <span className={`rounded-full px-2 py-1 text-xs font-medium ${isFinished ? 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300' : 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}`}>
@@ -59,14 +67,20 @@ function MatchCard({ match, prediction, onSubmit }: { match: Match, prediction?:
         </span>
       </div>
 
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <div className="flex-1 text-right font-semibold text-slate-800 dark:text-slate-100">{match.home_team}</div>
-        <div className="text-xl font-bold text-slate-300 dark:text-slate-600">vs</div>
-        <div className="flex-1 font-semibold text-slate-800 dark:text-slate-100">{match.away_team}</div>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex flex-1 min-w-0 items-center justify-end gap-2 text-right font-semibold text-slate-800 dark:text-slate-100">
+          <span className="truncate">{match.home_team}</span>
+          <TeamFlag teamName={match.home_team} />
+        </div>
+        <div className="text-xl font-bold text-slate-300 dark:text-slate-600 shrink-0">vs</div>
+        <div className="flex flex-1 min-w-0 items-center justify-start gap-2 text-left font-semibold text-slate-800 dark:text-slate-100">
+          <TeamFlag teamName={match.away_team} />
+          <span className="truncate">{match.away_team}</span>
+        </div>
       </div>
 
       {isFinished ? (
-        <div className="rounded-lg bg-slate-50 p-4 text-center dark:bg-slate-900/50">
+        <div className="mt-auto rounded-lg bg-slate-50 p-4 text-center dark:bg-slate-900/50">
           <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">Resultado Final</p>
           <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
             {match.home_score} - {match.away_score}
@@ -83,7 +97,7 @@ function MatchCard({ match, prediction, onSubmit }: { match: Match, prediction?:
           )}
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="mt-auto flex flex-col gap-3">
           <div className="flex items-center justify-center gap-4">
             <input
               type="number"
