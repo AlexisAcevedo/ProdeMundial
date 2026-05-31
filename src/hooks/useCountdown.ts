@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 
-export function useCountdown(targetDate: string | Date) {
+export function useCountdown(targetDate: string | Date | number) {
   const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft(targetDate));
 
-  function calculateTimeLeft(target: string | Date) {
+  function calculateTimeLeft(target: string | Date | number) {
     const difference = new Date(target).getTime() - Date.now();
     
     if (difference <= 0) {

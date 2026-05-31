@@ -33,12 +33,13 @@ export function Dashboard() {
 
   useEffect(() => {
     if (!user) return;
+    const userId = user.id;
     async function fetchProfile() {
       try {
         const { data, error } = await supabase
           .from('users')
           .select('name, avatar_url')
-          .eq('id', user.id)
+          .eq('id', userId)
           .single();
 
         if (error) throw error;

@@ -1,6 +1,6 @@
 import { useCountdown } from '../hooks/useCountdown';
 
-export function CountdownTimer({ targetDate }: { targetDate: string | Date }) {
+export function CountdownTimer({ targetDate }: { targetDate: string | Date | number }) {
   const { days, hours, minutes, seconds, isExpired } = useCountdown(targetDate);
 
   if (isExpired) {

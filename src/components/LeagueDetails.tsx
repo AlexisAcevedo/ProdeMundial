@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useLeagueAdmin } from '../hooks/useLeagueAdmin';
 import { useToast } from '../contexts/ToastContext';
 import { StandingRowSkeleton } from './Skeleton';
+import { LeagueStats } from './LeagueStats';
 
 interface LeagueDetailsProps {
   league: League;
@@ -150,6 +151,8 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
           </div>
         )}
       </div>
+
+      <LeagueStats leagueId={league.id} />
 
       {isOwner && (
         <div className="rounded-2xl border border-red-200/50 bg-red-50/50 p-6 dark:border-red-950/20 dark:bg-red-950/5 mt-8">
