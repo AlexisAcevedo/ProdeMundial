@@ -48,6 +48,9 @@ async function main() {
     const kickoff_at = parts[6];
     const match_label = parts[7];
 
+    // Generamos un UUID determinista usando el id numérico del partido para hacer el script idempotent
+    const matchId = `00000000-0000-0000-0000-${id.toString().padStart(12, '0')}`;
+
     let home_team = teamsMap.get(home_team_id);
     let away_team = teamsMap.get(away_team_id);
 
@@ -65,7 +68,7 @@ async function main() {
     }
 
     matchesToInsert.push({
-      // Eliminado 'id' para que Supabase genere su propio UUID automáticamente
+      id: matchId,
       home_team,
       away_team,
       kickoff_time: kickoff_at,
