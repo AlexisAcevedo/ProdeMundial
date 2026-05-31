@@ -16,14 +16,14 @@ import { ProfileModal } from '../components/ProfileModal';
 export function Dashboard() {
   const { user, signOut } = useAuth();
   const { matches, isLoading: loadingMatches } = useMatches();
-  const { predictions, submitPrediction, isLoading: loadingPredictions } = usePredictions();
+  const { predictions, submitPrediction, submitPredictions, isLoading: loadingPredictions } = usePredictions();
   const { leagues, joinLeague, createLeague, isLoading: loadingLeagues } = useLeagues();
   const { theme, toggleTheme } = useTheme();
   
   const [inviteCode, setInviteCode] = useState('');
   const [newLeagueName, setNewLeagueName] = useState('');
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'groups' | 'bracket' | 'ranking' | 'pending'>('groups');
+  const [activeTab, setActiveTab] = useState<'all' | 'groups' | 'bracket' | 'ranking' | 'pending' | 'history' | 'bulk'>('groups');
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
 
@@ -182,6 +182,7 @@ export function Dashboard() {
               matches={matches}
               predictions={predictions}
               onSubmit={submitPrediction}
+              onSubmitBulk={submitPredictions}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
             />

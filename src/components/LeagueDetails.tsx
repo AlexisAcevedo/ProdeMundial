@@ -1,6 +1,9 @@
 import { useLeagueStandings } from '../hooks/useLeagueStandings';
 import type { League } from '../lib/types';
 import { ShareLeague } from './ShareLeague';
+import { useAuth } from '../hooks/useAuth';
+import { useLeagueAdmin } from '../hooks/useLeagueAdmin';
+import { useToast } from '../contexts/ToastContext';
 
 interface LeagueDetailsProps {
   league: League;
@@ -9,6 +12,38 @@ interface LeagueDetailsProps {
 
 export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
   const { standings, isLoading, error } = useLeagueStandings(league.id);
+  const { user } = useAuth();
+  const { removeMember, deleteLeague, isLoading: isAdminActionLoading } = useLeagueAdmin();
+  const { addToast } = useToast();
+
+  const isOwner = league.owner_id === user?.id;
+
+  const handleKickMember = async (participantId: string, participantName: string) => {
+    if (!window.confirm(`¿Estás seguro de que querés expulsar a ${participantName} de la liga?`)) {
+      return;
+    }
+
+    try {
+      await removeMember(league.id, participantId);
+      addToast(`Expulsaste a ${participantName} de la liga`, 'success');
+    } catch (err: any) {
+      addToast(err.message || 'Error al expulsar al miembro', 'error');
+    }
+  };
+
+  const handleDeleteLeague = async () => {
+    if (!window.confirm('¿Estás absolutamente seguro de que querés eliminar esta liga? Esta acción es irreversible.')) {
+      return;
+    }
+
+    try {
+      await deleteLeague(league.id);
+      addToast('Liga eliminada con éxito', 'success');
+      onBack();
+    } catch (err: any) {
+      addToast(err.message || 'Error al eliminar la liga', 'error');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -54,6 +89,7 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
                   <th className="px-6 py-4">Pos</th>
                   <th className="px-6 py-4">Participante</th>
                   <th className="px-6 py-4 text-right">Puntos</th>
+                  {isOwner && <th className="px-6 py-4 text-right">Acciones</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -84,6 +120,22 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
                         {participant.total_points}
                       </span>
                     </td>
+                    {isOwner && (
+                      <td className="px-6 py-4 text-right">
+                        {participant.user_id !== user?.id && (
+                          <button
+                            onClick={() => handleKickMember(participant.user_id, participant.name || participant.email)}
+                            disabled={isAdminActionLoading}
+                            className="text-red-500 hover:text-red-400 transition-colors p-1"
+                            title="Expulsar de la liga"
+                          >
+                            <svg className="w-5 h-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -91,6 +143,27 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
           </div>
         )}
       </div>
+
+      {isOwner && (
+        <div className="rounded-2xl border border-red-200/50 bg-red-50/50 p-6 dark:border-red-950/20 dark:bg-red-950/5 mt-8">
+          <h3 className="text-lg font-bold text-red-900 dark:text-red-400 mb-2 flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Zona de Peligro
+          </h3>
+          <p className="text-xs text-red-700/80 dark:text-red-400/80 mb-4">
+            Al eliminar la liga, se perderán todos los datos de clasificaciones y miembros asociados de forma permanente. Esta acción no se puede deshacer.
+          </p>
+          <button
+            onClick={handleDeleteLeague}
+            disabled={isAdminActionLoading}
+            className="rounded-xl bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold py-3 px-5 text-sm transition-all shadow-md shadow-red-500/20"
+          >
+            {isAdminActionLoading ? 'Eliminando...' : 'Eliminar Liga Permanentemente'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

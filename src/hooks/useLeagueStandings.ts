@@ -63,6 +63,13 @@ export function useLeagueStandings(leagueId: string | null) {
           setTrigger((t) => t + 1);
         }
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'league_members', filter: `league_id=eq.${leagueId}` },
+        () => {
+          setTrigger((t) => t + 1);
+        }
+      )
       .subscribe();
 
     return () => {

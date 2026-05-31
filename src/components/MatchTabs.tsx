@@ -6,19 +6,23 @@ import { TournamentBracket } from './TournamentBracket';
 import { GlobalStandings } from './GlobalStandings';
 import { PendingBadge } from './PendingBadge';
 import { usePendingPredictions } from '../hooks/usePendingPredictions';
+import { PredictionHistory } from './PredictionHistory';
+import { BulkPredictionView } from './BulkPredictionView';
 
-type Tab = 'all' | 'groups' | 'bracket' | 'ranking' | 'pending';
+type Tab = 'all' | 'groups' | 'bracket' | 'ranking' | 'pending' | 'history' | 'bulk';
 
 export function MatchTabs({
   matches,
   predictions,
   onSubmit,
+  onSubmitBulk,
   activeTab: controlledActiveTab,
   setActiveTab: controlledSetActiveTab,
 }: {
   matches: Match[];
   predictions: Prediction[];
   onSubmit: (matchId: string, home: number, away: number) => Promise<void>;
+  onSubmitBulk: (items: { matchId: string; homeScore: number; awayScore: number }[]) => Promise<any>;
   activeTab?: Tab;
   setActiveTab?: (tab: Tab) => void;
 }) {
@@ -35,6 +39,8 @@ export function MatchTabs({
     { id: 'bracket', label: 'Fase Final', icon: '🏆' },
     { id: 'pending', label: 'Pendientes', icon: '⚡', badge: pendingCount },
     { id: 'ranking', label: 'Ranking', icon: '🏅' },
+    { id: 'history', label: 'Historial', icon: '📜' },
+    { id: 'bulk', label: 'Carga Rápida', icon: '📥' },
   ];
 
   return (
@@ -128,6 +134,18 @@ export function MatchTabs({
 
       {activeTab === 'ranking' && (
         <GlobalStandings />
+      )}
+
+      {activeTab === 'history' && (
+        <PredictionHistory matches={matches} predictions={predictions} />
+      )}
+
+      {activeTab === 'bulk' && (
+        <BulkPredictionView
+          matches={matches}
+          predictions={predictions}
+          onSubmitBulk={onSubmitBulk}
+        />
       )}
     </div>
   );

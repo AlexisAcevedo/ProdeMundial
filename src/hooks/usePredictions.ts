@@ -119,5 +119,53 @@ export function usePredictions() {
     }
   };
 
-  return { predictions, isLoading, error, submitPrediction };
+  /**
+   * Envía o actualiza múltiples pronósticos a la vez (Bulk Upsert).
+   * 
+   * @param items - Arreglo de objetos con el id del partido y los goles pronosticados.
+   * @returns La lista de pronósticos guardados en la base de datos.
+   */
+  const submitPredictions = async (items: { matchId: string; homeScore: number; awayScore: number }[]) => {
+    if (!user) throw new Error('Usuario no autenticado');
+    if (items.length === 0) return [];
+
+    try {
+      const payload = items.map(item => ({
+        user_id: user.id,
+        match_id: item.matchId,
+        home_score: item.homeScore,
+        away_score: item.awayScore,
+      }));
+
+      const { data, error } = await supabase
+        .from('predictions')
+        .upsert(payload, { onConflict: 'user_id,match_id' })
+        .select();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        setPredictions((prev) => {
+          let updated = [...prev];
+          data.forEach((newPred) => {
+            const index = updated.findIndex((p) => p.match_id === newPred.match_id);
+            if (index !== -1) {
+              updated[index] = newPred;
+            } else {
+              updated.push(newPred);
+            }
+          });
+          return updated;
+        });
+      }
+
+      return data;
+    } catch (e: any) {
+      throw e;
+    }
+  };
+
+  return { predictions, isLoading, error, submitPrediction, submitPredictions };
 }

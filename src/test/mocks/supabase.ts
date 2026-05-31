@@ -78,6 +78,7 @@ export const createSupabaseMock = () => {
 
   return {
     client,
+    queryBuilder,
     mockFrom,
     mockRpc,
     mockSelect,
