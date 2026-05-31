@@ -3,16 +3,36 @@ import type { ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
+/**
+ * Interfaz que define la estructura del contexto de autenticación.
+ */
 interface AuthContextType {
+  /** Sesión actual activa provista por Supabase */
   session: Session | null;
+  /** Datos del usuario autenticado */
   user: User | null;
+  /** Indicador de si el estado inicial se está cargando */
   isLoading: boolean;
+  /**
+   * Inicia el flujo de autenticación OAuth con Google.
+   * Redirige a la página principal una vez logueado.
+   */
   signInWithGoogle: () => Promise<void>;
+  /** Cierra la sesión activa en el cliente y en Supabase */
   signOut: () => Promise<void>;
 }
 
+/**
+ * Contexto global que provee el estado de la sesión de usuario y métodos de autenticación.
+ */
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Proveedor de estado global de sesión de usuario y métodos OAuth.
+ * Este componente debe envolver a la aplicación entera para proveer el contexto de autenticación.
+ * 
+ * @param children - Elementos React hijos a renderizar dentro del contexto
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);

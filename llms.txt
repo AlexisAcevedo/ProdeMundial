@@ -1,26 +1,15 @@
 # ProdeMundial
+> Aplicación web React + TypeScript + Supabase para predicciones de resultados de fútbol y ligas privadas.
 
-> React + TypeScript + Supabase application for football match predictions (prodes) and private leagues.
+## Archivos Principales
+- [src/main.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/main.tsx): Punto de entrada y proveedor de autenticación de la App.
+- [src/App.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/App.tsx): Enrutador principal (Decide entre mostrar pantalla de Login o el Dashboard).
+- [src/pages/Dashboard.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/pages/Dashboard.tsx): Vista principal interactiva (partidos, carga de predicciones, ranking, ligas).
+- [src/contexts/AuthContext.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/contexts/AuthContext.tsx): Contexto de sesión de Supabase y manejo del flujo OAuth con Google.
+- [src/hooks/](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/hooks/): Toda la lógica de conexión con Supabase (usePredictions, useLeagues, useMatches, useStandings).
+- [supabase/migrations/schema.sql](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/supabase/migrations/schema.sql): Esquema de BD PostgreSQL, políticas RLS de seguridad y triggers de puntaje automático.
 
-## Core Files
-
-- [src/main.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/main.tsx): Application entry point wrapping the React app in `<AuthProvider>`.
-- [src/App.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/App.tsx): Manages authentication routes and displays either the Google login screen or the `<Dashboard>`.
-- [src/pages/Dashboard.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/pages/Dashboard.tsx): Main dashboard displaying lists of matches, active predictions forms, user score indicators, and a league management sidebar.
-- [src/contexts/AuthContext.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/contexts/AuthContext.tsx): Context managing Supabase Session, User info, loading state, Google OAuth flow, and sign-out.
-- [src/hooks/usePredictions.ts](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/hooks/usePredictions.ts): Context-aware hook to upsert predictions and retrieve predictions for the current user.
-- [src/hooks/useLeagues.ts](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/hooks/useLeagues.ts): Hook managing fetching of joined leagues and joining new leagues via invite codes.
-- [src/hooks/useMatches.ts](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/hooks/useMatches.ts): Fetches the full list of matches sorted ascendingly by kickoff time.
-- [supabase/migrations/schema.sql](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/supabase/migrations/schema.sql): Database schema definitions, RLS rules, and scoring trigger.
-- [src/lib/types.ts](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/lib/types.ts): Typings for User, League, Match, and Prediction interfaces.
-
-## Key Rules & Concepts
-
-- **30-Minute Cutoff Policy**: Users can only create or update predictions up to 30 minutes before the kickoff time of a match. This is hard-enforced in PostgreSQL Row Level Security (RLS) policies for inserts and updates on the `predictions` table.
-- **Auto-Scoring Engine**: Points are calculated in database space. The trigger `on_match_finished` automatically executes `calculate_prediction_points()` when a row in the `matches` table is updated with a status of `'finished'`.
-- **Scoring Rules**:
-  - Exact Score match = 3 points.
-  - Correct Winner or Tie outcome (but wrong score) = 1 point.
-  - Incorrect Outcome = 0 points.
-- **Google OAuth**: Relies on Supabase external provider login, redirecting back to `window.location.origin`.
-- **Private Leagues**: Access controls are based on `league_members` mapping users to `leagues` rows. Members can join by submitting the league's unique `invite_code`.
+## Conceptos Clave
+- **Regla de 30 minutos (RLS)**: Los pronósticos solo pueden insertarse o actualizarse hasta 30 minutos antes del partido. Esto se impone de forma inviolable mediante Row Level Security (RLS) directamente en la base de datos PostgreSQL de Supabase.
+- **Motor de Puntuación Automatizado**: Los puntos no se calculan en el cliente React. Se usa un trigger (`on_match_finished`) en la BD que calcula los puntos automáticamente: Acierto exacto = 3 pts, Acierto de resultado (ganador/empate) = 1 pt.
+- **Ligas Privadas**: Acceso a competencias gestionado mediante la tabla relacional `league_members`. Se requiere un código único de invitación (`invite_code`) de 6 caracteres para acceder.

@@ -16,6 +16,12 @@ export interface Standing {
   rank: number;
 }
 
+/**
+ * Hook para obtener la tabla de posiciones oficial de un grupo específico.
+ * 
+ * @param groupLetter - Letra del grupo (ej: 'A', 'B') para consultar sus posiciones.
+ * @returns {object} Lista de posiciones del grupo, estado de carga y posibles errores.
+ */
 export function useStandings(groupLetter: string) {
   const [standings, setStandings] = useState<Standing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
