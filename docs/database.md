@@ -39,3 +39,13 @@ El trigger `on_match_finished` se dispara cuando la fila de un partido (`matches
 3. **Incorrecto (0 Puntos)**: No acertó el resultado.
 
 Esta arquitectura transaccional de triggers garantiza coherencia sin importar cuántos miles de usuarios estén participando simultáneamente.
+
+## 4. Gestión de Migraciones
+
+Todas las modificaciones de base de datos, políticas, triggers y funciones RPC se estructuran como scripts SQL dentro del directorio [supabase/migrations/](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/supabase/migrations).
+
+> [!IMPORTANT]
+> **Procedimiento de Despliegue en Producción**:
+> Al carecer de un pipeline de CLI automatizado (GitHub Actions/Supabase CLI), cada archivo `.sql` en el directorio de migraciones debe ser copiado y ejecutado manualmente a través del **SQL Editor** del Panel de Control de Supabase.
+>
+> Asegurate de haber ejecutado todas las migraciones en orden (o al menos las funciones específicas como `get_league_stats.sql` y `get_league_standings.sql`) para que la aplicación frontend funcione correctamente y no arroje errores de consulta RPC en la interfaz.

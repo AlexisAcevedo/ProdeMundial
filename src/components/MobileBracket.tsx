@@ -22,7 +22,7 @@ export function MobileBracket({
   const [activeRound, setActiveRound] = useState<RoundTab>('r16'); // Por defecto Octavos que es más común, o r32 si tiene partidos
 
   const rounds: { id: RoundTab; label: string; matchNumbers: number[] }[] = [
-    { id: 'r32', label: '32avos', matchNumbers: R32_NUMBERS },
+    { id: 'r32', label: '16avos de final', matchNumbers: R32_NUMBERS },
     { id: 'r16', label: 'Octavos', matchNumbers: R16_NUMBERS },
     { id: 'qf', label: 'Cuartos', matchNumbers: QF_NUMBERS },
     { id: 'sf', label: 'Semis', matchNumbers: SF_NUMBERS },

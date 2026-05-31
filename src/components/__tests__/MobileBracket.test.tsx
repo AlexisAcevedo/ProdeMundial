@@ -56,7 +56,7 @@ describe('MobileBracket Component', () => {
     render(<MobileBracket matches={dummyMatches} predictions={[]} onSubmit={mockOnSubmit} />);
 
     // Round buttons
-    expect(screen.getByRole('button', { name: '32avos' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '16avos de final' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Octavos' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cuartos' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Semis' })).toBeInTheDocument();

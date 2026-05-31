@@ -30,6 +30,15 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
     return !isFinished && !isPastCutoff;
   });
 
+  const [showOnlyPending, setShowOnlyPending] = useState(() => {
+    return activeMatches.some((match) => !predictions.some((p) => p.match_id === match.id));
+  });
+
+  // Filtrar por pendientes si el switch está activo
+  const displayedMatches = showOnlyPending
+    ? activeMatches.filter((match) => !predictions.some((p) => p.match_id === match.id))
+    : activeMatches;
+
   // Inicializar estado temporal con predicciones existentes
   useEffect(() => {
     const initial: Record<string, TempPrediction> = {};
@@ -140,63 +149,89 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
         </div>
       </div>
 
-      {/* Grid de partidos compactos */}
-      <div className="space-y-3">
-        {activeMatches.map((match) => {
-          const temp = tempPredictions[match.id] || { homeScore: '', awayScore: '', isModified: false };
-          
-          return (
-            <div
-              key={match.id}
-              className={`rounded-xl border bg-white px-4 py-3 shadow-sm dark:bg-fifa-card transition-colors flex items-center justify-between gap-4 ${
-                temp.isModified
-                  ? 'border-emerald-500 dark:border-emerald-500/50 ring-1 ring-emerald-500/20'
-                  : 'border-slate-200/60 dark:border-white/5'
-              }`}
-            >
-              {/* Info de partido */}
-              <div className="flex-1 min-w-0 pr-2">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  {formatter.format(new Date(match.kickoff_time))} {match.group_letter ? `• Grupo ${match.group_letter}` : ''}
-                </span>
-                
-                <div className="flex items-center gap-2 mt-1 font-bold text-slate-700 dark:text-slate-200 text-xs sm:text-sm truncate">
-                  <TeamFlag teamName={match.home_team} />
-                  <span className="truncate">{match.home_team}</span>
-                  <span className="text-slate-400 dark:text-slate-600 font-bold shrink-0">vs</span>
-                  <span className="truncate">{match.away_team}</span>
-                  <TeamFlag teamName={match.away_team} />
+      {/* Filtros */}
+      <div className="flex items-center justify-between rounded-2xl bg-white/40 p-2.5 dark:bg-fifa-card/40 border border-slate-200/50 dark:border-white/5 backdrop-blur-sm">
+        <span className="text-xs font-bold text-slate-700 dark:text-slate-300 px-1">Filtros disponibles</span>
+        <button
+          type="button"
+          onClick={() => setShowOnlyPending(!showOnlyPending)}
+          className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all active:scale-95 border ${
+            showOnlyPending
+              ? 'bg-amber-500 text-white border-amber-400/35 shadow-md shadow-amber-500/10'
+              : 'text-slate-500 border-slate-200 hover:text-slate-700 dark:text-slate-400 dark:border-white/5 dark:hover:text-slate-200'
+          }`}
+        >
+          <span>⚡ Solo pendientes</span>
+        </button>
+      </div>
+
+      {/* Grid de partidos compactos o Estado Vacío */}
+      {displayedMatches.length === 0 ? (
+        <div className="flex h-48 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white/50 p-6 dark:border-white/5 dark:bg-fifa-card/50 backdrop-blur-sm text-center">
+          <span className="text-3xl mb-2">🎉</span>
+          <h3 className="text-base font-bold text-slate-800 dark:text-white">¡Estás al día!</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
+            No tenés partidos pendientes por pronosticar. Desactivá el filtro de "Solo pendientes" arriba si querés modificar tus pronósticos cargados.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {displayedMatches.map((match) => {
+            const temp = tempPredictions[match.id] || { homeScore: '', awayScore: '', isModified: false };
+            
+            return (
+              <div
+                key={match.id}
+                className={`rounded-xl border bg-white px-4 py-3 shadow-sm dark:bg-fifa-card transition-colors flex items-center justify-between gap-4 ${
+                  temp.isModified
+                    ? 'border-emerald-500 dark:border-emerald-500/50 ring-1 ring-emerald-500/20'
+                    : 'border-slate-200/60 dark:border-white/5'
+                }`}
+              >
+                {/* Info de partido */}
+                <div className="flex-1 min-w-0 pr-2">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                    {formatter.format(new Date(match.kickoff_time))} {match.group_letter ? `• Grupo ${match.group_letter}` : ''}
+                  </span>
+                  
+                  <div className="flex items-center gap-2 mt-1 font-bold text-slate-700 dark:text-slate-200 text-xs sm:text-sm truncate">
+                    <TeamFlag teamName={match.home_team} />
+                    <span className="truncate">{match.home_team}</span>
+                    <span className="text-slate-400 dark:text-slate-600 font-bold shrink-0">vs</span>
+                    <span className="truncate">{match.away_team}</span>
+                    <TeamFlag teamName={match.away_team} />
+                  </div>
+                </div>
+
+                {/* Inputs de goles compactos */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={temp.homeScore}
+                    onChange={(e) => handleScoreChange(match.id, 'home', e.target.value)}
+                    disabled={isSubmitting}
+                    className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50/50 text-center text-lg font-black outline-none transition-all focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 dark:border-white/10 dark:bg-fifa-dark/50 dark:text-white dark:focus:border-brand-500"
+                    placeholder="-"
+                  />
+                  <span className="text-slate-300 dark:text-slate-600 font-bold">-</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={temp.awayScore}
+                    onChange={(e) => handleScoreChange(match.id, 'away', e.target.value)}
+                    disabled={isSubmitting}
+                    className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50/50 text-center text-lg font-black outline-none transition-all focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 dark:border-white/10 dark:bg-fifa-dark/50 dark:text-white dark:focus:border-brand-500"
+                    placeholder="-"
+                  />
                 </div>
               </div>
-
-              {/* Inputs de goles compactos */}
-              <div className="flex items-center gap-2 shrink-0">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={temp.homeScore}
-                  onChange={(e) => handleScoreChange(match.id, 'home', e.target.value)}
-                  disabled={isSubmitting}
-                  className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50/50 text-center text-lg font-black outline-none transition-all focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 dark:border-white/10 dark:bg-fifa-dark/50 dark:text-white dark:focus:border-brand-500"
-                  placeholder="-"
-                />
-                <span className="text-slate-300 dark:text-slate-600 font-bold">-</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={temp.awayScore}
-                  onChange={(e) => handleScoreChange(match.id, 'away', e.target.value)}
-                  disabled={isSubmitting}
-                  className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50/50 text-center text-lg font-black outline-none transition-all focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 dark:border-white/10 dark:bg-fifa-dark/50 dark:text-white dark:focus:border-brand-500"
-                  placeholder="-"
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Botón flotante/fijo de Guardar Cambios */}
       {hasChanges && (

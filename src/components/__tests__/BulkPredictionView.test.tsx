@@ -84,6 +84,10 @@ describe('BulkPredictionView Component', () => {
       </ToastProvider>
     );
 
+    // Desactivar el filtro de solo pendientes para ver todos
+    const filterButton = screen.getByRole('button', { name: /solo pendientes/i });
+    fireEvent.click(filterButton);
+
     // Debe mostrar los dos partidos predecibles (Argentina vs Brazil y Spain vs Italy)
     expect(screen.getByText('Argentina')).toBeInTheDocument();
     expect(screen.getByText('Brazil')).toBeInTheDocument();
@@ -111,6 +115,9 @@ describe('BulkPredictionView Component', () => {
         <BulkPredictionView matches={dummyMatches} predictions={dummyPredictions} onSubmitBulk={mockSubmitBulk} />
       </ToastProvider>
     );
+    // Desactivar el filtro de solo pendientes
+    const filterButton = screen.getByRole('button', { name: /solo pendientes/i });
+    fireEvent.click(filterButton);
 
     // Inicialmente no debe mostrar el botón de guardar porque no hay cambios
     expect(screen.queryByRole('button', { name: /guardar/i })).not.toBeInTheDocument();

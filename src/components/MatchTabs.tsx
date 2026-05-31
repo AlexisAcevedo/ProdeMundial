@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { Match, Prediction } from '../lib/types';
-import { MatchCard } from './MatchCard';
 import { GroupFilter } from './GroupFilter';
 import { TournamentBracket } from './TournamentBracket';
 import { GlobalStandings } from './GlobalStandings';
@@ -10,7 +9,7 @@ import { PredictionHistory } from './PredictionHistory';
 import { BulkPredictionView } from './BulkPredictionView';
 import { MobileBracket } from './MobileBracket';
 
-type Tab = 'all' | 'groups' | 'bracket' | 'ranking' | 'pending' | 'history' | 'bulk';
+type Tab = 'groups' | 'bracket' | 'ranking' | 'history' | 'bulk';
 
 export function MatchTabs({
   matches,
@@ -32,16 +31,14 @@ export function MatchTabs({
   const setActiveTab = controlledSetActiveTab ?? localSetActiveTab;
   const [selectedGroup, setSelectedGroup] = useState('A');
 
-  const { pendingCount, pendingMatches } = usePendingPredictions(matches, predictions);
+  const { pendingCount } = usePendingPredictions(matches, predictions);
 
   const tabs: { id: Tab; label: string; icon: string; badge?: number }[] = [
-    { id: 'groups', label: 'Por Grupo', icon: '🏟️' },
-    { id: 'all', label: 'Todos', icon: '📋' },
+    { id: 'groups', label: 'Grupos', icon: '🏟️' },
     { id: 'bracket', label: 'Fase Final', icon: '🏆' },
-    { id: 'pending', label: 'Pendientes', icon: '⚡', badge: pendingCount },
-    { id: 'ranking', label: 'Ranking', icon: '🏅' },
+    { id: 'bulk', label: 'Carga Rápida', icon: '📥', badge: pendingCount },
     { id: 'history', label: 'Historial', icon: '📜' },
-    { id: 'bulk', label: 'Carga Rápida', icon: '📥' },
+    { id: 'ranking', label: 'Ranking', icon: '🏅' },
   ];
 
   return (
@@ -73,24 +70,6 @@ export function MatchTabs({
       </div>
 
       {/* Tab content */}
-      {activeTab === 'all' && (
-        <>
-          {matches.length === 0 ? (
-            <p className="text-slate-500">No hay partidos disponibles.</p>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {matches.map((match) => (
-                <MatchCard
-                  key={match.id}
-                  match={match}
-                  prediction={predictions.find((p) => p.match_id === match.id)}
-                  onSubmit={onSubmit}
-                />
-              ))}
-            </div>
-          )}
-        </>
-      )}
 
       {activeTab === 'groups' && (
         <GroupFilter
@@ -118,29 +97,6 @@ export function MatchTabs({
               onSubmit={onSubmit}
             />
           </div>
-        </>
-      )}
-
-      {activeTab === 'pending' && (
-        <>
-          {pendingMatches.length === 0 ? (
-            <div className="flex h-32 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white/50 dark:border-white/5 dark:bg-white/5 backdrop-blur-sm text-center">
-              <span className="text-lg">🎉</span>
-              <p className="text-sm font-bold text-slate-800 dark:text-white mt-1">¡Estás al día!</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">No tenés pronósticos pendientes para los próximos partidos.</p>
-            </div>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {pendingMatches.map((match) => (
-                <MatchCard
-                  key={match.id}
-                  match={match}
-                  prediction={predictions.find((p) => p.match_id === match.id)}
-                  onSubmit={onSubmit}
-                />
-              ))}
-            </div>
-          )}
         </>
       )}
 

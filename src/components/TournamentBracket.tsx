@@ -82,7 +82,7 @@ export function BracketMatchCard({
       {/* Teams */}
       <div className="space-y-1">
         <div className={`flex items-center justify-between gap-2 transition-all ${awayWins ? 'opacity-50 grayscale-[50%]' : ''}`}>
-          <div className="flex min-w-0 items-center gap-1.5">
+          <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
             <TeamFlag teamName={match.home_team} />
             <span className={`truncate text-xs ${homeWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-semibold text-slate-700 dark:text-slate-200'}`}>
               {match.home_team}
@@ -107,7 +107,7 @@ export function BracketMatchCard({
         </div>
 
         <div className={`flex items-center justify-between gap-2 transition-all ${homeWins ? 'opacity-50 grayscale-[50%]' : ''}`}>
-          <div className="flex min-w-0 items-center gap-1.5">
+          <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
             <TeamFlag teamName={match.away_team} />
             <span className={`truncate text-xs ${awayWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-semibold text-slate-700 dark:text-slate-200'}`}>
               {match.away_team}
@@ -178,7 +178,7 @@ export function TournamentBracket({
   const leftColumns = [
     {
       stage: 'Round of 32',
-      label: '32avos',
+      label: '16avos de final',
       matches: LEFT_R32.map((num) => matches.find((m) => m.match_number === num)).filter(Boolean) as Match[],
     },
     {
@@ -217,7 +217,7 @@ export function TournamentBracket({
     },
     {
       stage: 'Round of 32',
-      label: '32avos',
+      label: '16avos de final',
       matches: RIGHT_R32.map((num) => matches.find((m) => m.match_number === num)).filter(Boolean) as Match[],
     },
   ];

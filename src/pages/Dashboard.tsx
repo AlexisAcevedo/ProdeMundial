@@ -24,7 +24,7 @@ export function Dashboard() {
   const [inviteCode, setInviteCode] = useState('');
   const [newLeagueName, setNewLeagueName] = useState('');
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'groups' | 'bracket' | 'ranking' | 'pending' | 'history' | 'bulk'>('groups');
+  const [activeTab, setActiveTab] = useState<'groups' | 'bracket' | 'ranking' | 'history' | 'bulk'>('groups');
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
 
@@ -184,7 +184,7 @@ export function Dashboard() {
               Partidos
             </h2>
             
-            {pendingCount > 0 && activeTab !== 'pending' && (
+            {pendingCount > 0 && activeTab !== 'bulk' && (
               <div className="mb-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 flex items-center justify-between gap-4 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl animate-pulse">⚡</span>
@@ -194,7 +194,7 @@ export function Dashboard() {
                   </div>
                 </div>
                 <button
-                  onClick={() => setActiveTab('pending')}
+                  onClick={() => setActiveTab('bulk')}
                   className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white px-4 py-2 text-xs font-bold shadow-sm transition-all"
                 >
                   Pronosticar ahora
