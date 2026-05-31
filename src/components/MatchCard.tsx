@@ -55,80 +55,92 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
   });
 
   return (
-    <div className="flex flex-col h-full rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800">
-      <div className="mb-4 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
-        <span>{formatter.format(new Date(match.kickoff_time))}</span>
-        <span className={`rounded-full px-2 py-1 text-xs font-medium ${isFinished ? 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300' : 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'}`}>
+    <div className="flex flex-col h-full rounded-2xl glass-card p-5 group hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 dark:hover:shadow-brand-500/5 relative overflow-hidden">
+      {/* Decorative gradient orb for active/hover state */}
+      {!isFinished && <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>}
+      
+      <div className="mb-5 flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
+        <span className="flex items-center gap-1.5">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          {formatter.format(new Date(match.kickoff_time))}
+        </span>
+        <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${isFinished ? 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border border-slate-200 dark:border-white/5' : 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 border border-brand-200 dark:border-brand-800/50'}`}>
           {isFinished ? 'Finalizado' : 'Próximo'}
         </span>
       </div>
 
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex flex-1 min-w-0 items-center justify-end gap-2 text-right font-semibold text-slate-800 dark:text-slate-100">
+      <div className="mb-6 flex items-center justify-between gap-3 relative z-10">
+        <div className="flex flex-1 min-w-0 items-center justify-end gap-3 text-right font-bold text-slate-800 dark:text-white text-lg">
           <span className="truncate">{match.home_team}</span>
-          <TeamFlag teamName={match.home_team} />
+          <TeamFlag teamName={match.home_team} className="scale-125" />
         </div>
-        <div className="text-xl font-bold text-slate-300 dark:text-slate-600 shrink-0">vs</div>
-        <div className="flex flex-1 min-w-0 items-center justify-start gap-2 text-left font-semibold text-slate-800 dark:text-slate-100">
-          <TeamFlag teamName={match.away_team} />
+        <div className="text-xl font-black text-slate-300 dark:text-slate-600 shrink-0 px-2">VS</div>
+        <div className="flex flex-1 min-w-0 items-center justify-start gap-3 text-left font-bold text-slate-800 dark:text-white text-lg">
+          <TeamFlag teamName={match.away_team} className="scale-125" />
           <span className="truncate">{match.away_team}</span>
         </div>
       </div>
 
       {isFinished ? (
-        <div className="mt-auto rounded-lg bg-slate-50 p-4 text-center dark:bg-slate-900/50">
-          <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">Resultado Final</p>
-          <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-            {match.home_score} - {match.away_score}
+        <div className="mt-auto rounded-xl bg-slate-50 p-4 text-center dark:bg-white/5 border border-slate-100 dark:border-white/5">
+          <p className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Resultado Final</p>
+          <p className="text-3xl font-black text-slate-800 dark:text-white">
+            {match.home_score} <span className="text-brand-500">-</span> {match.away_score}
           </p>
           {prediction && (
-            <div className="mt-3 border-t border-slate-200 pt-3 dark:border-slate-700">
-              <p className="text-sm">
-                Tu pronóstico: <span className="font-bold">{prediction.home_score} - {prediction.away_score}</span>
+            <div className="mt-4 border-t border-slate-200/50 pt-4 dark:border-white/5 flex flex-col gap-1">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                Tu pronóstico: <span className="font-bold text-slate-900 dark:text-white bg-slate-200/50 dark:bg-white/10 px-2 py-0.5 rounded">{prediction.home_score} - {prediction.away_score}</span>
               </p>
-              <p className="mt-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                Puntos: {prediction.points}
-              </p>
+              <div className="mt-2 inline-flex items-center justify-center gap-1.5 self-center rounded-full bg-accent-teal/10 px-3 py-1 text-sm font-bold text-accent-teal">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"></path></svg>
+                {prediction.points} Puntos
+              </div>
             </div>
           )}
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="mt-auto flex flex-col gap-3">
-          <div className="flex items-center justify-center gap-4">
+        <form onSubmit={handleSubmit} className="mt-auto flex flex-col gap-4 relative z-10">
+          <div className="flex items-center justify-center gap-6">
             <input
               type="number"
               min="0"
               value={homeScore}
               onChange={(e) => setHomeScore(e.target.value)}
               disabled={!canPredict || isSubmitting}
-              className="w-16 rounded-lg border border-slate-300 bg-slate-50 p-2 text-center text-lg font-bold outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+              className="w-16 h-16 rounded-xl border border-slate-200 bg-slate-50/50 text-center text-2xl font-black outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:opacity-50 dark:border-white/10 dark:bg-fifa-dark/50 dark:text-white dark:focus:border-brand-500 dark:focus:ring-brand-500/20 shadow-inner"
             />
-            <span className="text-slate-400">-</span>
+            <span className="text-slate-300 dark:text-slate-600 font-bold">-</span>
             <input
               type="number"
               min="0"
               value={awayScore}
               onChange={(e) => setAwayScore(e.target.value)}
               disabled={!canPredict || isSubmitting}
-              className="w-16 rounded-lg border border-slate-300 bg-slate-50 p-2 text-center text-lg font-bold outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+              className="w-16 h-16 rounded-xl border border-slate-200 bg-slate-50/50 text-center text-2xl font-black outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:opacity-50 dark:border-white/10 dark:bg-fifa-dark/50 dark:text-white dark:focus:border-brand-500 dark:focus:ring-brand-500/20 shadow-inner"
             />
           </div>
           
-          {error && <p className="text-center text-sm text-red-500">{error}</p>}
-          {success && <p className="text-center text-sm text-emerald-500">¡Guardado!</p>}
+          <div className="h-5 flex items-center justify-center">
+            {error && <p className="text-xs font-medium text-red-500">{error}</p>}
+            {success && <p className="text-xs font-medium text-accent-green">¡Pronóstico guardado!</p>}
+          </div>
+
           {!isPastCutoff && (
             <button
               type="submit"
               disabled={isSubmitting || homeScore === '' || awayScore === ''}
-              className="mt-2 w-full rounded-lg bg-blue-600 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-slate-300 disabled:text-slate-500 dark:bg-blue-600 dark:hover:bg-blue-500 dark:disabled:bg-slate-700"
+              className="w-full rounded-xl bg-brand-600 py-3 text-sm font-bold text-white transition-all hover:bg-brand-500 active:scale-95 disabled:opacity-50 disabled:active:scale-100 disabled:hover:bg-brand-600 shadow-md shadow-brand-500/20"
             >
-              {isSubmitting ? 'Guardando...' : (prediction ? 'Actualizar' : 'Guardar')}
+              {isSubmitting ? 'Guardando...' : (prediction ? 'Actualizar Pronóstico' : 'Guardar Pronóstico')}
             </button>
           )}
           {isPastCutoff && !isFinished && (
-            <p className="text-center text-sm text-slate-500">
-              Cierre de pronósticos finalizado.
-            </p>
+            <div className="rounded-xl bg-slate-100 dark:bg-white/5 py-3 text-center border border-slate-200 dark:border-white/5">
+              <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+                🔒 Pronósticos cerrados
+              </p>
+            </div>
           )}
         </form>
       )}

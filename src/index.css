@@ -1,18 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-brand-50: #f0fdf4;
-  --color-brand-100: #dcfce7;
-  --color-brand-500: #22c55e;
-  --color-brand-600: #16a34a;
-  --color-brand-900: #14532d;
+  --font-sans: 'Outfit', sans-serif;
   
+  /* Brand colors inspired by FIFA 2026 (Violet/Purple base) */
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
+  
+  /* Accent colors */
+  --color-accent-teal: #06b6d4;
+  --color-accent-green: #10b981;
+  --color-accent-magenta: #d946ef;
+
+  /* Surfaces */
   --color-surface-50: #f8fafc;
   --color-surface-100: #f1f5f9;
   --color-surface-800: #1e293b;
   --color-surface-900: #0f172a;
+  
+  /* Deep Dark FIFA */
+  --color-fifa-dark: #07070a;
+  --color-fifa-card: #111118;
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50 antialiased;
+  @apply bg-slate-50 text-slate-900 dark:bg-fifa-dark dark:text-slate-50 antialiased font-sans transition-colors duration-300;
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm dark:bg-fifa-card/70 dark:border-white/5;
+}
+
+.glass-card {
+  @apply bg-white/80 backdrop-blur-sm border border-slate-100 shadow-sm dark:bg-slate-800/50 dark:border-slate-700/50 transition-all duration-300;
 }

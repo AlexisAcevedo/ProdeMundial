@@ -225,7 +225,7 @@ export function TournamentBracket({
 
   return (
     <div className="w-full overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
-      <div className="flex min-w-[1300px] justify-center items-stretch gap-4 px-2 py-4">
+      <div className="flex w-max min-w-[1300px] mx-auto items-stretch gap-4 px-2 py-4">
         
         {/* LADO IZQUIERDO */}
         {leftColumns.map((col, colIdx) => (
