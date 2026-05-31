@@ -67,7 +67,7 @@ export function Dashboard() {
       <div className="fixed bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-accent-teal/10 blur-[100px] rounded-full pointer-events-none hidden dark:block z-0"></div>
 
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 px-4 py-4 backdrop-blur-md dark:border-white/5 dark:bg-fifa-dark/80">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
+        <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between px-2 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Prode<span className="text-brand-600 dark:text-brand-400">Mundial</span></h1>
           <div className="flex items-center gap-4">
             <button 
@@ -92,11 +92,11 @@ export function Dashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl p-4 md:py-8 relative z-10">
+      <main className="mx-auto w-full max-w-[1920px] p-4 sm:px-6 lg:px-8 md:py-8 relative z-10">
         {selectedLeague ? (
           <LeagueDetails league={selectedLeague} onBack={() => setSelectedLeague(null)} />
         ) : (
-          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+          <div className="grid gap-6 lg:grid-cols-[1fr_240px] xl:grid-cols-[1fr_280px]">
             <div className="min-w-0">
             <h2 className="mb-6 text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
               <svg className="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -109,9 +109,11 @@ export function Dashboard() {
             />
           </div>
 
-          <div className="space-y-6">
-            <div className="glass-card rounded-2xl p-6">
-              <h2 className="mb-4 text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+          <div className="space-y-4">
+            {/* Espaciador invisible para alinear las cards con las tabs de secciones */}
+            <div className="mb-6 hidden h-8 lg:block" />
+            <div className="glass-card rounded-2xl p-4 sm:p-5">
+              <h2 className="mb-3 text-lg font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                 <svg className="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 Mis Ligas
               </h2>

@@ -64,29 +64,32 @@ function BracketMatchCard({
     minute: '2-digit',
   }).format(new Date(match.kickoff_time));
 
+  const homeWins = isFinished && Number(match.home_score) > Number(match.away_score);
+  const awayWins = isFinished && Number(match.away_score) > Number(match.home_score);
+
   return (
     <div
-      className={`bracket-match rounded-xl border bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.02] dark:bg-slate-800/80 ${
+      className={`bracket-match rounded-xl border bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.02] dark:bg-slate-800/80 relative z-10 ${
         isFinished
           ? 'border-slate-200 dark:border-slate-700'
-          : 'border-blue-200 dark:border-blue-800/60 shadow-[0_0_12px_rgba(59,130,246,0.02)]'
-      } ${compact ? 'p-2.5' : 'p-3.5'}`}
+          : 'border-brand-200 dark:border-brand-800/60 shadow-[0_0_12px_rgba(139,92,246,0.05)]'
+      } ${compact ? 'p-1.5' : 'p-2'}`}
     >
-      <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+      <p className="mb-1 text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
         {dateStr}
       </p>
 
       {/* Teams */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between gap-2">
+      <div className="space-y-1">
+        <div className={`flex items-center justify-between gap-2 transition-all ${awayWins ? 'opacity-50 grayscale-[50%]' : ''}`}>
           <div className="flex min-w-0 items-center gap-1.5">
             <TeamFlag teamName={match.home_team} />
-            <span className="truncate text-xs font-semibold text-slate-700 dark:text-slate-200">
+            <span className={`truncate text-xs ${homeWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-semibold text-slate-700 dark:text-slate-200'}`}>
               {match.home_team}
             </span>
           </div>
           {isFinished ? (
-            <span className="text-sm font-bold text-slate-800 dark:text-slate-100 tabular-nums">
+            <span className={`text-sm tabular-nums ${homeWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-bold text-slate-800 dark:text-slate-100'}`}>
               {match.home_score}
             </span>
           ) : canPredict ? (
@@ -96,22 +99,22 @@ function BracketMatchCard({
               value={homeScore}
               onChange={(e) => setHomeScore(e.target.value)}
               disabled={isSubmitting}
-              className="w-10 rounded-md border border-slate-300 bg-slate-50/50 px-1 py-0.5 text-center text-xs font-bold outline-none transition-all focus:border-blue-500 focus:bg-white dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100 dark:focus:border-blue-400"
+              className="w-8 rounded-[4px] border border-slate-300 bg-slate-50/50 px-0 py-0 text-center text-[10px] font-bold outline-none transition-all focus:border-brand-500 focus:bg-white dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100 dark:focus:border-brand-400"
             />
           ) : (
             <span className="text-xs text-slate-400">-</span>
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-2">
+        <div className={`flex items-center justify-between gap-2 transition-all ${homeWins ? 'opacity-50 grayscale-[50%]' : ''}`}>
           <div className="flex min-w-0 items-center gap-1.5">
             <TeamFlag teamName={match.away_team} />
-            <span className="truncate text-xs font-semibold text-slate-700 dark:text-slate-200">
+            <span className={`truncate text-xs ${awayWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-semibold text-slate-700 dark:text-slate-200'}`}>
               {match.away_team}
             </span>
           </div>
           {isFinished ? (
-            <span className="text-sm font-bold text-slate-800 dark:text-slate-100 tabular-nums">
+            <span className={`text-sm tabular-nums ${awayWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-bold text-slate-800 dark:text-slate-100'}`}>
               {match.away_score}
             </span>
           ) : canPredict ? (
@@ -121,7 +124,7 @@ function BracketMatchCard({
               value={awayScore}
               onChange={(e) => setAwayScore(e.target.value)}
               disabled={isSubmitting}
-              className="w-10 rounded-md border border-slate-300 bg-slate-50/50 px-1 py-0.5 text-center text-xs font-bold outline-none transition-all focus:border-blue-500 focus:bg-white dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100 dark:focus:border-blue-400"
+              className="w-8 rounded-[4px] border border-slate-300 bg-slate-50/50 px-0 py-0 text-center text-[10px] font-bold outline-none transition-all focus:border-brand-500 focus:bg-white dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100 dark:focus:border-brand-400"
             />
           ) : (
             <span className="text-xs text-slate-400">-</span>
@@ -131,11 +134,11 @@ function BracketMatchCard({
 
       {/* Predict button / status */}
       {canPredict && (
-        <form onSubmit={handleSubmit} className="mt-2.5">
+        <form onSubmit={handleSubmit} className="mt-1.5">
           <button
             type="submit"
             disabled={isSubmitting || homeScore === '' || awayScore === ''}
-            className="w-full rounded-md bg-blue-600 px-2 py-1.5 text-[10px] font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-700 dark:disabled:text-slate-500"
+            className="w-full rounded-md bg-blue-600 px-1.5 py-1 text-[9px] font-bold text-white transition-all hover:bg-blue-700 active:scale-[0.98] disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-700 dark:disabled:text-slate-500"
           >
             {isSubmitting ? '...' : prediction ? 'Actualizar' : 'Guardar'}
           </button>
@@ -231,41 +234,50 @@ export function TournamentBracket({
         {leftColumns.map((col, colIdx) => (
           <div
             key={col.stage + '-left'}
-            className="flex flex-col flex-1 min-w-[150px] max-w-[170px]"
+            className="flex flex-col flex-1 min-w-[110px] max-w-[130px]"
           >
             {/* Stage Header */}
-            <div className="mb-4 text-center">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <div className="mb-2 text-center">
+              <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 {col.label}
               </h4>
-              <p className="text-[9px] text-slate-400 dark:text-slate-500">
+              <p className="text-[8px] text-slate-400 dark:text-slate-500">
                 {col.matches.length} {col.matches.length === 1 ? 'partido' : 'partidos'}
               </p>
             </div>
 
             {/* Match List */}
-            <div className="flex flex-1 flex-col justify-around gap-2">
-              {col.matches.map((match) => (
-                <div key={match.id} className="bracket-match-wrapper relative py-1">
+            <div className="flex flex-1 flex-col">
+              {col.matches.map((match, i) => {
+                const isTop = i % 2 === 0;
+                return (
+                <div key={match.id} className="bracket-match-wrapper relative flex-1 flex flex-col justify-center py-2">
                   <BracketMatchCard
                     match={match}
                     prediction={predictions.find((p) => p.match_id === match.id)}
                     onSubmit={onSubmit}
                     compact={col.stage === 'Round of 32'}
                   />
-                  {/* Connector Line to the Right */}
+                  {/* Left Side Connectors */}
+                  {/* Sends to right (R32, R16, QF) */}
                   {colIdx < 3 ? (
-                    <div className="absolute right-0 top-1/2 hidden h-px w-4 -translate-y-1/2 translate-x-full bg-slate-300 dark:bg-slate-700 lg:block">
-                      <div className="absolute right-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-blue-500/80 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
-                    </div>
+                    <>
+                      <div className="absolute right-0 top-1/2 hidden h-px w-2 translate-x-full bg-slate-300 dark:bg-slate-700 lg:block" />
+                      <div className={`absolute right-[-8px] hidden w-px bg-slate-300 dark:bg-slate-700 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
+                    </>
                   ) : (
-                    // Left Semifinal to Center (Final)
-                    <div className="absolute right-0 top-1/2 hidden h-px w-6 -translate-y-1/2 translate-x-full bg-gradient-to-r from-blue-500 to-amber-500 lg:block">
+                    // SF sends to Final
+                    <div className="absolute right-0 top-1/2 hidden h-px w-6 -translate-y-1/2 translate-x-full bg-gradient-to-r from-brand-500 to-amber-500 lg:block">
                       <div className="absolute right-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
                     </div>
                   )}
+                  {/* Receives from left (R16, QF, SF) */}
+                  {colIdx > 0 && (
+                    <div className="absolute left-0 top-1/2 hidden h-px w-2 -translate-x-full bg-slate-300 dark:bg-slate-700 lg:block" />
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
@@ -321,41 +333,50 @@ export function TournamentBracket({
         {rightColumns.map((col, colIdx) => (
           <div
             key={col.stage + '-right'}
-            className="flex flex-col flex-1 min-w-[150px] max-w-[170px]"
+            className="flex flex-col flex-1 min-w-[110px] max-w-[130px]"
           >
             {/* Stage Header */}
-            <div className="mb-4 text-center">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <div className="mb-2 text-center">
+              <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 {col.label}
               </h4>
-              <p className="text-[9px] text-slate-400 dark:text-slate-500">
+              <p className="text-[8px] text-slate-400 dark:text-slate-500">
                 {col.matches.length} {col.matches.length === 1 ? 'partido' : 'partidos'}
               </p>
             </div>
 
             {/* Match List */}
-            <div className="flex flex-1 flex-col justify-around gap-2">
-              {col.matches.map((match) => (
-                <div key={match.id} className="bracket-match-wrapper relative py-1">
+            <div className="flex flex-1 flex-col">
+              {col.matches.map((match, i) => {
+                const isTop = i % 2 === 0;
+                return (
+                <div key={match.id} className="bracket-match-wrapper relative flex-1 flex flex-col justify-center py-2">
                   <BracketMatchCard
                     match={match}
                     prediction={predictions.find((p) => p.match_id === match.id)}
                     onSubmit={onSubmit}
                     compact={col.stage === 'Round of 32'}
                   />
-                  {/* Connector Line to the Left */}
+                  {/* Right Side Connectors */}
+                  {/* Sends to left (R32, R16, QF) */}
                   {colIdx > 0 ? (
-                    <div className="absolute left-0 top-1/2 hidden h-px w-4 -translate-y-1/2 -translate-x-full bg-slate-300 dark:bg-slate-700 lg:block">
-                      <div className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-blue-500/80 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
-                    </div>
+                    <>
+                      <div className="absolute left-0 top-1/2 hidden h-px w-2 -translate-x-full bg-slate-300 dark:bg-slate-700 lg:block" />
+                      <div className={`absolute left-[-8px] hidden w-px bg-slate-300 dark:bg-slate-700 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
+                    </>
                   ) : (
-                    // Right Semifinal to Center (Final)
-                    <div className="absolute left-0 top-1/2 hidden h-px w-6 -translate-y-1/2 -translate-x-full bg-gradient-to-l from-blue-500 to-amber-500 lg:block">
+                    // SF sends to Final
+                    <div className="absolute left-0 top-1/2 hidden h-px w-6 -translate-y-1/2 -translate-x-full bg-gradient-to-l from-brand-500 to-amber-500 lg:block">
                       <div className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
                     </div>
                   )}
+                  {/* Receives from right (R16, QF, SF) */}
+                  {colIdx < 3 && (
+                    <div className="absolute right-0 top-1/2 hidden h-px w-2 translate-x-full bg-slate-300 dark:bg-slate-700 lg:block" />
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
