@@ -5,6 +5,7 @@ import { getTeamFlagCode } from '../lib/teamFlags';
 import { CountdownTimer } from './CountdownTimer';
 import { useToast } from '../contexts/ToastContext';
 import { MatchPredictionsList } from './MatchPredictionsList';
+import { SuccessAnimation } from './SuccessAnimation';
 
 export function TeamFlag({ teamName, className = '' }: { teamName: string; className?: string }) {
   const code = getTeamFlagCode(teamName);
@@ -17,6 +18,7 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
   const [awayScore, setAwayScore] = useState<string>(prediction?.away_score?.toString() ?? '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOthers, setShowOthers] = useState(false);
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const { addToast } = useToast();
 
   const isFinished = match.status === 'finished';
@@ -38,6 +40,8 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
     setIsSubmitting(true);
     try {
       await onSubmit(match.id, parseInt(homeScore, 10), parseInt(awayScore, 10));
+      setShowSuccessOverlay(true);
+      setTimeout(() => setShowSuccessOverlay(false), 2000);
       addToast('¡Pronóstico guardado exitosamente!', 'success');
     } catch (err: any) {
       addToast(err.message || 'Error al guardar pronóstico (puede haber pasado el tiempo límite)', 'error');
@@ -56,6 +60,11 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
 
   return (
     <div className="flex flex-col h-full rounded-2xl glass-card p-5 group hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 dark:hover:shadow-brand-500/5 relative overflow-hidden">
+      {showSuccessOverlay && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/95 dark:bg-fifa-card/95 backdrop-blur-[2px] rounded-2xl animate-fade-in">
+          <SuccessAnimation />
+        </div>
+      )}
       {/* Decorative gradient orb for active/hover state */}
       {!isFinished && <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>}
       

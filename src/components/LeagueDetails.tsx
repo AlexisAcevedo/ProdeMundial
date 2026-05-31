@@ -4,6 +4,7 @@ import { ShareLeague } from './ShareLeague';
 import { useAuth } from '../hooks/useAuth';
 import { useLeagueAdmin } from '../hooks/useLeagueAdmin';
 import { useToast } from '../contexts/ToastContext';
+import { StandingRowSkeleton } from './Skeleton';
 
 interface LeagueDetailsProps {
   league: League;
@@ -76,7 +77,13 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
         </div>
         
         {isLoading ? (
-          <div className="p-8 text-center text-slate-500 dark:text-slate-400">Cargando posiciones...</div>
+          <div className="divide-y divide-slate-100 dark:divide-white/5">
+            <StandingRowSkeleton />
+            <StandingRowSkeleton />
+            <StandingRowSkeleton />
+            <StandingRowSkeleton />
+            <StandingRowSkeleton />
+          </div>
         ) : error ? (
           <div className="p-8 text-center text-red-500">Error al cargar posiciones: {error.message}</div>
         ) : standings.length === 0 ? (

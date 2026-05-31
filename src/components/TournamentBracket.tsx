@@ -12,7 +12,7 @@ const RIGHT_QF = [99, 100];
 const RIGHT_R16 = [91, 92, 95, 96];
 const RIGHT_R32 = [76, 78, 79, 80, 86, 88, 85, 87];
 
-function BracketMatchCard({
+export function BracketMatchCard({
   match,
   prediction,
   onSubmit,

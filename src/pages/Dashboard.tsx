@@ -12,6 +12,7 @@ import { PendingBadge } from '../components/PendingBadge';
 import { useToast } from '../contexts/ToastContext';
 import { supabase } from '../lib/supabase';
 import { ProfileModal } from '../components/ProfileModal';
+import { Skeleton, MatchCardSkeleton } from '../components/Skeleton';
 
 export function Dashboard() {
   const { user, signOut } = useAuth();
@@ -85,10 +86,32 @@ export function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-fifa-dark">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-500 border-t-transparent"></div>
-          <div className="text-slate-500 dark:text-slate-400 font-medium">Cargando...</div>
+      <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-fifa-dark dark:text-slate-100 p-4 sm:p-6 md:p-8 space-y-8">
+        {/* Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton width="180px" height="28px" />
+            <Skeleton width="100px" height="14px" />
+          </div>
+          <Skeleton variant="circular" width="40px" height="40px" />
+        </div>
+
+        {/* Banner Skeleton */}
+        <Skeleton height="70px" className="w-full" />
+
+        {/* Tab switcher Skeleton */}
+        <div className="flex gap-2">
+          <Skeleton width="110px" height="40px" />
+          <Skeleton width="110px" height="40px" />
+          <Skeleton width="110px" height="40px" />
+        </div>
+
+        {/* Main Content: Match Cards Skeletons */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <MatchCardSkeleton />
+          <MatchCardSkeleton />
+          <MatchCardSkeleton />
+          <MatchCardSkeleton />
         </div>
       </div>
     );

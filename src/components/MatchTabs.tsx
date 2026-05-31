@@ -8,6 +8,7 @@ import { PendingBadge } from './PendingBadge';
 import { usePendingPredictions } from '../hooks/usePendingPredictions';
 import { PredictionHistory } from './PredictionHistory';
 import { BulkPredictionView } from './BulkPredictionView';
+import { MobileBracket } from './MobileBracket';
 
 type Tab = 'all' | 'groups' | 'bracket' | 'ranking' | 'pending' | 'history' | 'bulk';
 
@@ -102,11 +103,22 @@ export function MatchTabs({
       )}
 
       {activeTab === 'bracket' && (
-        <TournamentBracket
-          matches={matches}
-          predictions={predictions}
-          onSubmit={onSubmit}
-        />
+        <>
+          <div className="block md:hidden">
+            <MobileBracket
+              matches={matches}
+              predictions={predictions}
+              onSubmit={onSubmit}
+            />
+          </div>
+          <div className="hidden md:block">
+            <TournamentBracket
+              matches={matches}
+              predictions={predictions}
+              onSubmit={onSubmit}
+            />
+          </div>
+        </>
       )}
 
       {activeTab === 'pending' && (
