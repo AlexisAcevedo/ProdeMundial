@@ -24,4 +24,4 @@ BEGIN
   GROUP BY u.id, u.email, u.name, u.avatar_url
   ORDER BY total_points DESC, exact_count DESC, correct_count DESC, u.email ASC;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY INVOKER;

@@ -111,7 +111,7 @@ BEGIN
     LIMIT 1
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY INVOKER;
 
 -- Notificar a PostgREST
 NOTIFY pgrst, 'reload schema';
