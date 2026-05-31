@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useMatches } from '../hooks/useMatches';
 import { usePredictions } from '../hooks/usePredictions';
@@ -9,6 +9,9 @@ import { LeagueDetails } from '../components/LeagueDetails';
 import type { League } from '../lib/types';
 import { usePendingPredictions } from '../hooks/usePendingPredictions';
 import { PendingBadge } from '../components/PendingBadge';
+import { useToast } from '../contexts/ToastContext';
+import { supabase } from '../lib/supabase';
+import { ProfileModal } from '../components/ProfileModal';
 
 export function Dashboard() {
   const { user, signOut } = useAuth();
@@ -18,24 +21,50 @@ export function Dashboard() {
   const { theme, toggleTheme } = useTheme();
   
   const [inviteCode, setInviteCode] = useState('');
-  const [leagueError, setLeagueError] = useState('');
   const [newLeagueName, setNewLeagueName] = useState('');
-  const [createLeagueError, setCreateLeagueError] = useState('');
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'groups' | 'bracket' | 'ranking' | 'pending'>('groups');
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
 
+  const { addToast } = useToast();
   const { pendingCount } = usePendingPredictions(matches, predictions);
+
+  useEffect(() => {
+    if (!user) return;
+    async function fetchProfile() {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('name, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setProfile({ name: data.name, avatar_url: data.avatar_url });
+        }
+      } catch (err) {
+        console.error('Error al cargar perfil público', err);
+      }
+    }
+    fetchProfile();
+  }, [user]);
+
+  const handleProfileUpdate = (name: string, avatarUrl: string) => {
+    setProfile({ name, avatar_url: avatarUrl });
+  };
 
   const handleJoinLeague = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteCode) return;
     
-    setLeagueError('');
     try {
       await joinLeague(inviteCode);
       setInviteCode('');
+      addToast('¡Te uniste a la liga con éxito!', 'success');
     } catch (err: any) {
-      setLeagueError(err.message);
+      addToast(err.message || 'Error al unirse a la liga', 'error');
     }
   };
 
@@ -43,12 +72,12 @@ export function Dashboard() {
     e.preventDefault();
     if (!newLeagueName) return;
     
-    setCreateLeagueError('');
     try {
       await createLeague(newLeagueName);
       setNewLeagueName('');
+      addToast('¡Liga creada con éxito!', 'success');
     } catch (err: any) {
-      setCreateLeagueError(err.message);
+      addToast(err.message || 'Error al crear la liga', 'error');
     }
   };
 
@@ -86,8 +115,28 @@ export function Dashboard() {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
               )}
             </button>
-            <div className="flex items-center gap-2">
-              <span className="hidden text-sm sm:inline text-slate-500 dark:text-slate-400">{user?.email}</span>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowProfileModal(true)}
+                className="flex items-center gap-2 text-left hover:bg-slate-100 dark:hover:bg-white/5 p-1.5 rounded-xl transition-colors"
+                title="Editar perfil"
+              >
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt="" className="h-8 w-8 rounded-lg object-cover border border-slate-200 dark:border-white/10 shrink-0" />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-400 font-bold shrink-0">
+                    {profile.name ? profile.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="hidden sm:flex flex-col min-w-0">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate max-w-[120px]">
+                    {profile.name || user?.email?.split('@')[0]}
+                  </span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate max-w-[120px]">
+                    {user?.email}
+                  </span>
+                </div>
+              </button>
               <PendingBadge count={pendingCount} />
             </div>
             <button 
@@ -181,7 +230,6 @@ export function Dashboard() {
                     Unirse
                   </button>
                 </div>
-                {leagueError && <p className="mt-2 text-xs text-red-500">{leagueError}</p>}
               </form>
             </div>
 
@@ -208,13 +256,22 @@ export function Dashboard() {
                     Crear
                   </button>
                 </div>
-                {createLeagueError && <p className="mt-2 text-xs text-red-500">{createLeagueError}</p>}
               </form>
             </div>
           </div>
         </div>
         )}
       </main>
+
+      {showProfileModal && user && (
+        <ProfileModal
+          userId={user.id}
+          currentName={profile.name}
+          currentAvatarUrl={profile.avatar_url}
+          onClose={() => setShowProfileModal(false)}
+          onProfileUpdate={handleProfileUpdate}
+        />
+      )}
     </div>
   );
 }

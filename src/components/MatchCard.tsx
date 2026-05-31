@@ -3,6 +3,8 @@ import type { Match, Prediction } from '../lib/types';
 import 'flag-icons/css/flag-icons.min.css';
 import { getTeamFlagCode } from '../lib/teamFlags';
 import { CountdownTimer } from './CountdownTimer';
+import { useToast } from '../contexts/ToastContext';
+import { MatchPredictionsList } from './MatchPredictionsList';
 
 export function TeamFlag({ teamName, className = '' }: { teamName: string; className?: string }) {
   const code = getTeamFlagCode(teamName);
@@ -14,8 +16,8 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
   const [homeScore, setHomeScore] = useState<string>(prediction?.home_score?.toString() ?? '');
   const [awayScore, setAwayScore] = useState<string>(prediction?.away_score?.toString() ?? '');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [showOthers, setShowOthers] = useState(false);
+  const { addToast } = useToast();
 
   const isFinished = match.status === 'finished';
   
@@ -27,21 +29,18 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess(false);
 
     if (homeScore === '' || awayScore === '') {
-      setError('Ingresa ambos resultados');
+      addToast('Ingresa ambos resultados', 'warning');
       return;
     }
 
     setIsSubmitting(true);
     try {
       await onSubmit(match.id, parseInt(homeScore, 10), parseInt(awayScore, 10));
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      addToast('¡Pronóstico guardado exitosamente!', 'success');
     } catch (err: any) {
-      setError(err.message || 'Error al guardar pronóstico (puede haber pasado el tiempo límite)');
+      addToast(err.message || 'Error al guardar pronóstico (puede haber pasado el tiempo límite)', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -126,10 +125,7 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
             />
           </div>
           
-          <div className="h-5 flex items-center justify-center">
-            {error && <p className="text-xs font-medium text-red-500">{error}</p>}
-            {success && <p className="text-xs font-medium text-accent-green">¡Pronóstico guardado!</p>}
-          </div>
+          <div className="h-2" />
 
           {!isPastCutoff && (
             <button
@@ -148,6 +144,29 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
             </div>
           )}
         </form>
+      )}
+
+      {(isPastCutoff || isFinished) && (
+        <div className="mt-4 border-t border-slate-100 pt-3 dark:border-white/5 flex flex-col z-10 relative">
+          <button
+            type="button"
+            onClick={() => setShowOthers(!showOthers)}
+            className="flex items-center justify-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 transition-colors py-1 self-center"
+          >
+            <span>{showOthers ? 'Ocultar pronósticos' : 'Ver pronósticos de otros'}</span>
+            <svg className={`w-4 h-4 transform transition-transform duration-200 ${showOthers ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {showOthers && (
+            <MatchPredictionsList
+              matchId={match.id}
+              isPastCutoff={isPastCutoff || isFinished}
+              isFinished={isFinished}
+            />
+          )}
+        </div>
       )}
     </div>
   );

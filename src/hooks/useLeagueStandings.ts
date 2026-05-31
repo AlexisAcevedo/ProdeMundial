@@ -20,6 +20,7 @@ export function useLeagueStandings(leagueId: string | null) {
   const [standings, setStandings] = useState<LeagueStanding[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [trigger, setTrigger] = useState(0);
 
   useEffect(() => {
     async function fetchStandings() {
@@ -48,6 +49,25 @@ export function useLeagueStandings(leagueId: string | null) {
     }
 
     fetchStandings();
+  }, [leagueId, trigger]);
+
+  useEffect(() => {
+    if (!leagueId) return;
+
+    const channel = supabase
+      .channel(`league-standings-realtime-${leagueId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'predictions' },
+        () => {
+          setTrigger((t) => t + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [leagueId]);
 
   return { standings, isLoading, error };

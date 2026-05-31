@@ -48,6 +48,7 @@ export const createSupabaseMock = () => {
     from: mockFrom,
     rpc: mockRpc,
     channel: mockChannel,
+    removeChannel: vi.fn(),
     auth: {
       getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
       getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),

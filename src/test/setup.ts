@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
+import { createSupabaseMock } from './mocks/supabase'
+
+// Register globally to avoid relative require path resolution issues inside vi.mock callbacks
+(globalThis as any).createSupabaseMock = createSupabaseMock;
 
 // Mock matchMedia for components that check dark mode or screen width
 Object.defineProperty(window, 'matchMedia', {

@@ -34,6 +34,26 @@ export function useMatches() {
     }
 
     fetchMatches();
+
+    const channel = supabase
+      .channel('matches-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          const newMatch = payload.new as Match;
+          setMatches((prev) => [...prev, newMatch].sort((a, b) => new Date(a.kickoff_time).getTime() - new Date(b.kickoff_time).getTime()));
+        } else if (payload.eventType === 'UPDATE') {
+          const updatedMatch = payload.new as Match;
+          setMatches((prev) => prev.map((m) => m.id === updatedMatch.id ? updatedMatch : m));
+        } else if (payload.eventType === 'DELETE') {
+          const deletedMatch = payload.old as { id: string };
+          setMatches((prev) => prev.filter((m) => m.id !== deletedMatch.id));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return { matches, isLoading, error };

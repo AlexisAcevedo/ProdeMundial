@@ -42,6 +42,35 @@ export function usePredictions() {
     }
 
     fetchPredictions();
+
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`predictions-realtime-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'predictions', filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newPred = payload.new as Prediction;
+            setPredictions((prev) => {
+              if (prev.some((p) => p.id === newPred.id)) return prev;
+              return [...prev, newPred];
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedPred = payload.new as Prediction;
+            setPredictions((prev) => prev.map((p) => p.id === updatedPred.id ? updatedPred : p));
+          } else if (payload.eventType === 'DELETE') {
+            const deletedPred = payload.old as { id: string };
+            setPredictions((prev) => prev.filter((p) => p.id !== deletedPred.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   /**
