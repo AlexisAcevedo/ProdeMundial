@@ -44,8 +44,8 @@ export function ProfileModal({
       onProfileUpdate(name.trim(), avatarUrl.trim());
       addToast('¡Perfil actualizado con éxito!', 'success');
       onClose();
-    } catch (err: any) {
-      addToast(err.message || 'Error al actualizar el perfil', 'error');
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Error al actualizar el perfil', 'error');
     } finally {
       setIsSubmitting(false);
     }

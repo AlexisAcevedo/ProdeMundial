@@ -41,8 +41,8 @@ export function useLeagueStandings(leagueId: string | null) {
         }
 
         setStandings(data || []);
-      } catch (e: any) {
-        setError(e);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e : new Error(String(e)));
       } finally {
         setIsLoading(false);
       }

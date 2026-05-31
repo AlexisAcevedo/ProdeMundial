@@ -1,10 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import type { Match, Prediction } from '../lib/types';
 
 export function usePendingPredictions(matches: Match[], predictions: Prediction[]) {
-  return useMemo(() => {
-    const now = Date.now();
+  const [now, setNow] = useState(() => Date.now());
 
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return useMemo(() => {
     const pendingMatches = matches.filter((match) => {
       // 1. No finalizado
       if (match.status === 'finished') return false;
@@ -35,5 +40,5 @@ export function usePendingPredictions(matches: Match[], predictions: Prediction[
       pendingMatches,
       nextDeadline,
     };
-  }, [matches, predictions]);
+  }, [matches, predictions, now]);
 }

@@ -6,7 +6,7 @@ import { useToast } from '../contexts/ToastContext';
 interface BulkPredictionViewProps {
   matches: Match[];
   predictions: Prediction[];
-  onSubmitBulk: (items: { matchId: string; homeScore: number; awayScore: number }[]) => Promise<any>;
+  onSubmitBulk: (items: { matchId: string; homeScore: number; awayScore: number }[]) => Promise<unknown>;
 }
 
 interface TempPrediction {
@@ -20,13 +20,19 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
   const { addToast } = useToast();
   const [tempPredictions, setTempPredictions] = useState<Record<string, TempPrediction>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Filtrar partidos activos (predecibles)
   const activeMatches = matches.filter((match) => {
     const isFinished = match.status === 'finished';
     const kickoffTime = new Date(match.kickoff_time).getTime();
     const cutoffTime = kickoffTime - 30 * 60 * 1000;
-    const isPastCutoff = Date.now() >= cutoffTime;
+    const isPastCutoff = now >= cutoffTime;
     return !isFinished && !isPastCutoff;
   });
 
@@ -51,6 +57,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
         isModified: false,
       };
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTempPredictions(initial);
   }, [matches, predictions]);
 
@@ -105,8 +112,8 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
 
       await onSubmitBulk(itemsToSubmit);
       addToast(`¡Se guardaron ${itemsToSubmit.length} pronósticos con éxito!`, 'success');
-    } catch (err: any) {
-      addToast(err.message || 'Error al guardar los pronósticos masivos', 'error');
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Error al guardar los pronósticos masivos', 'error');
     } finally {
       setIsSubmitting(false);
     }

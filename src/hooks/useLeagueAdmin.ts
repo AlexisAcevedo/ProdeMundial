@@ -29,9 +29,10 @@ export function useLeagueAdmin() {
         .eq('user_id', userId);
 
       if (error) throw error;
-    } catch (e: any) {
-      setError(e);
-      throw e;
+    } catch (e: unknown) {
+      const err = e instanceof Error ? e : new Error(String(e));
+      setError(err);
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -53,9 +54,10 @@ export function useLeagueAdmin() {
         .eq('id', leagueId);
 
       if (error) throw error;
-    } catch (e: any) {
-      setError(e);
-      throw e;
+    } catch (e: unknown) {
+      const err = e instanceof Error ? e : new Error(String(e));
+      setError(err);
+      throw err;
     } finally {
       setIsLoading(false);
     }

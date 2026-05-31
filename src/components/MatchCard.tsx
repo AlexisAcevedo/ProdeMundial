@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Match, Prediction } from '../lib/types';
 import 'flag-icons/css/flag-icons.min.css';
 import { getTeamFlagCode } from '../lib/teamFlags';
@@ -21,12 +21,19 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const { addToast } = useToast();
 
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 30000); // Check every 30s
+    return () => clearInterval(interval);
+  }, []);
+
   const isFinished = match.status === 'finished';
   
   // Cutoff is 30 minutes before kickoff
   const kickoffTime = new Date(match.kickoff_time).getTime();
   const cutoffTime = kickoffTime - 30 * 60 * 1000;
-  const isPastCutoff = Date.now() >= cutoffTime;
+  const isPastCutoff = now >= cutoffTime;
   const canPredict = !isFinished && !isPastCutoff;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,8 +50,8 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
       setShowSuccessOverlay(true);
       setTimeout(() => setShowSuccessOverlay(false), 2000);
       addToast('¡Pronóstico guardado exitosamente!', 'success');
-    } catch (err: any) {
-      addToast(err.message || 'Error al guardar pronóstico (puede haber pasado el tiempo límite)', 'error');
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Error al guardar pronóstico (puede haber pasado el tiempo límite)', 'error');
     } finally {
       setIsSubmitting(false);
     }

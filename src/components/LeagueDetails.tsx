@@ -28,8 +28,8 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
     try {
       await removeMember(league.id, participantId);
       addToast(`Expulsaste a ${participantName} de la liga`, 'success');
-    } catch (err: any) {
-      addToast(err.message || 'Error al expulsar al miembro', 'error');
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Error al expulsar al miembro', 'error');
     }
   };
 
@@ -42,8 +42,8 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
       await deleteLeague(league.id);
       addToast('Liga eliminada con éxito', 'success');
       onBack();
-    } catch (err: any) {
-      addToast(err.message || 'Error al eliminar la liga', 'error');
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Error al eliminar la liga', 'error');
     }
   };
 

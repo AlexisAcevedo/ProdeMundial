@@ -20,9 +20,6 @@ export function useCountdown(targetDate: string | Date | number) {
   }
 
   useEffect(() => {
-    // Actualizar inmediatamente
-    setTimeLeft(calculateTimeLeft(targetDate));
-
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft(targetDate));
     }, 1000);

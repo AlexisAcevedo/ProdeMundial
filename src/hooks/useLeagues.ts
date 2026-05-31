@@ -36,10 +36,10 @@ export function useLeagues() {
           throw error;
         }
 
-        const userLeagues = data.map((item: any) => item.leagues);
+        const userLeagues = data.map((item: { leagues: unknown }) => item.leagues as League);
         setLeagues(userLeagues);
-      } catch (e: any) {
-        setError(e);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e : new Error(String(e)));
       } finally {
         setIsLoading(false);
       }
@@ -59,7 +59,7 @@ export function useLeagues() {
   const joinLeague = async (inviteCode: string) => {
     if (!user) throw new Error('Usuario no autenticado');
 
-    try {
+
       // 1. Find the league by invite code
       const { data: leagueData, error: leagueError } = await supabase
         .from('leagues')
@@ -88,9 +88,6 @@ export function useLeagues() {
 
       setLeagues((prev) => [...prev, leagueData as League]);
       return leagueData;
-    } catch (e: any) {
-      throw e;
-    }
   };
 
   /**
@@ -104,7 +101,7 @@ export function useLeagues() {
   const createLeague = async (name: string) => {
     if (!user) throw new Error('Usuario no autenticado');
 
-    try {
+
       // 1. Generate a random invite code (6 uppercase alphanumeric characters)
       const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
 
@@ -134,9 +131,6 @@ export function useLeagues() {
       // 4. Update state
       setLeagues((prev) => [...prev, newLeague as League]);
       return newLeague;
-    } catch (e: any) {
-      throw e;
-    }
   };
 
   return { leagues, isLoading, error, joinLeague, createLeague };

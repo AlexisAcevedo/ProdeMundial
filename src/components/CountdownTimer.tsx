@@ -27,7 +27,7 @@ export function CountdownTimer({ targetDate }: { targetDate: string | Date | num
   }
 
   // Formato compacto
-  let text = '';
+  let text: string;
   if (days > 0) {
     text = `${days}d ${hours}h ${minutes}m`;
   } else if (hours > 0) {

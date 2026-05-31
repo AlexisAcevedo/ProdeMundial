@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Match, Prediction } from '../lib/types';
 import { TeamFlag } from './MatchCard';
 
@@ -29,10 +29,17 @@ export function BracketMatchCard({
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const isFinished = match.status === 'finished';
   const kickoffTime = new Date(match.kickoff_time).getTime();
   const cutoffTime = kickoffTime - 30 * 60 * 1000;
-  const isPastCutoff = Date.now() >= cutoffTime;
+  const isPastCutoff = now >= cutoffTime;
   const canPredict = !isFinished && !isPastCutoff;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,8 +57,8 @@ export function BracketMatchCard({
       await onSubmit(match.id, parseInt(homeScore, 10), parseInt(awayScore, 10));
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2000);
-    } catch (err: any) {
-      setError(err.message || 'Error');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error');
     } finally {
       setIsSubmitting(false);
     }

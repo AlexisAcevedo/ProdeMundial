@@ -34,8 +34,8 @@ export function usePredictions() {
         }
 
         setPredictions(data as Prediction[]);
-      } catch (e: any) {
-        setError(e);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e : new Error(String(e)));
       } finally {
         setIsLoading(false);
       }
@@ -86,37 +86,33 @@ export function usePredictions() {
   const submitPrediction = async (matchId: string, homeScore: number, awayScore: number) => {
     if (!user) throw new Error('Usuario no autenticado');
 
-    try {
-      const { data, error } = await supabase
-        .from('predictions')
-        .upsert(
-          {
-            user_id: user.id,
-            match_id: matchId,
-            home_score: homeScore,
-            away_score: awayScore,
-          },
-          { onConflict: 'user_id,match_id' }
-        )
-        .select()
-        .single();
+    const { data, error } = await supabase
+      .from('predictions')
+      .upsert(
+        {
+          user_id: user.id,
+          match_id: matchId,
+          home_score: homeScore,
+          away_score: awayScore,
+        },
+        { onConflict: 'user_id,match_id' }
+      )
+      .select()
+      .single();
 
-      if (error) {
-        throw error;
-      }
-
-      setPredictions((prev) => {
-        const exists = prev.find((p) => p.id === data.id);
-        if (exists) {
-          return prev.map((p) => (p.id === data.id ? data : p));
-        }
-        return [...prev, data];
-      });
-
-      return data;
-    } catch (e: any) {
-      throw e;
+    if (error) {
+      throw error;
     }
+
+    setPredictions((prev) => {
+      const exists = prev.find((p) => p.id === data.id);
+      if (exists) {
+        return prev.map((p) => (p.id === data.id ? data : p));
+      }
+      return [...prev, data];
+    });
+
+    return data;
   };
 
   /**
@@ -129,7 +125,6 @@ export function usePredictions() {
     if (!user) throw new Error('Usuario no autenticado');
     if (items.length === 0) return [];
 
-    try {
       const payload = items.map(item => ({
         user_id: user.id,
         match_id: item.matchId,
@@ -148,7 +143,7 @@ export function usePredictions() {
 
       if (data) {
         setPredictions((prev) => {
-          let updated = [...prev];
+          const updated = [...prev];
           data.forEach((newPred) => {
             const index = updated.findIndex((p) => p.match_id === newPred.match_id);
             if (index !== -1) {
@@ -162,9 +157,6 @@ export function usePredictions() {
       }
 
       return data;
-    } catch (e: any) {
-      throw e;
-    }
   };
 
   return { predictions, isLoading, error, submitPrediction, submitPredictions };

@@ -39,9 +39,10 @@ export function useStandings(groupLetter: string) {
 
         if (error) throw error;
         setStandings(data as Standing[]);
-      } catch (err: any) {
-        console.error('Error fetching standings:', err.message);
-        setError(err.message);
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        console.error('Error fetching standings:', errorMsg);
+        setError(errorMsg);
       } finally {
         setIsLoading(false);
       }

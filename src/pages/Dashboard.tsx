@@ -65,8 +65,8 @@ export function Dashboard() {
       await joinLeague(inviteCode);
       setInviteCode('');
       addToast('¡Te uniste a la liga con éxito!', 'success');
-    } catch (err: any) {
-      addToast(err.message || 'Error al unirse a la liga', 'error');
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Error al unirse a la liga', 'error');
     }
   };
 
@@ -78,8 +78,8 @@ export function Dashboard() {
       await createLeague(newLeagueName);
       setNewLeagueName('');
       addToast('¡Liga creada con éxito!', 'success');
-    } catch (err: any) {
-      addToast(err.message || 'Error al crear la liga', 'error');
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Error al crear la liga', 'error');
     }
   };
 

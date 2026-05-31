@@ -22,7 +22,6 @@ export function useMatchPredictions(matchId: string, isPastCutoff: boolean) {
 
   useEffect(() => {
     if (!matchId || !isPastCutoff) {
-      setPredictions([]);
       return;
     }
 
@@ -52,6 +51,7 @@ export function useMatchPredictions(matchId: string, isPastCutoff: boolean) {
           throw error;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formattedData = (data || []).map((item: any) => ({
           id: item.id,
           home_score: item.home_score,
@@ -62,8 +62,8 @@ export function useMatchPredictions(matchId: string, isPastCutoff: boolean) {
         }));
 
         setPredictions(formattedData);
-      } catch (e: any) {
-        setError(e);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e : new Error(String(e)));
       } finally {
         setIsLoading(false);
       }
@@ -72,5 +72,9 @@ export function useMatchPredictions(matchId: string, isPastCutoff: boolean) {
     fetchPredictions();
   }, [matchId, isPastCutoff]);
 
-  return { predictions, isLoading, error };
+  return {
+    predictions: (!matchId || !isPastCutoff) ? [] : predictions,
+    isLoading,
+    error,
+  };
 }

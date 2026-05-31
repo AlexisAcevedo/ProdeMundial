@@ -22,7 +22,7 @@ export function MatchTabs({
   matches: Match[];
   predictions: Prediction[];
   onSubmit: (matchId: string, home: number, away: number) => Promise<void>;
-  onSubmitBulk: (items: { matchId: string; homeScore: number; awayScore: number }[]) => Promise<any>;
+  onSubmitBulk: (items: { matchId: string; homeScore: number; awayScore: number }[]) => Promise<unknown>;
   activeTab?: Tab;
   setActiveTab?: (tab: Tab) => void;
 }) {
