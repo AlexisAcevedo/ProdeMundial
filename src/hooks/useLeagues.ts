@@ -79,5 +79,43 @@ export function useLeagues() {
     }
   };
 
-  return { leagues, isLoading, error, joinLeague };
+  const createLeague = async (name: string) => {
+    if (!user) throw new Error('Usuario no autenticado');
+
+    try {
+      // 1. Generate a random invite code (6 uppercase alphanumeric characters)
+      const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+      // 2. Create the league
+      const { data: newLeague, error: createError } = await supabase
+        .from('leagues')
+        .insert({
+          name,
+          invite_code: inviteCode,
+          owner_id: user.id
+        })
+        .select()
+        .single();
+
+      if (createError) throw createError;
+
+      // 3. Add the creator as a member
+      const { error: joinError } = await supabase
+        .from('league_members')
+        .insert({
+          league_id: newLeague.id,
+          user_id: user.id,
+        });
+
+      if (joinError) throw joinError;
+
+      // 4. Update state
+      setLeagues((prev) => [...prev, newLeague as League]);
+      return newLeague;
+    } catch (e: any) {
+      throw e;
+    }
+  };
+
+  return { leagues, isLoading, error, joinLeague, createLeague };
 }
