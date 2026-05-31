@@ -1,5 +1,6 @@
 import type { Match, Prediction } from '../lib/types';
 import { MatchCard } from './MatchCard';
+import { StandingsTable } from './StandingsTable';
 
 const GROUPS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 
@@ -36,6 +37,10 @@ export function GroupFilter({
             Grupo {g}
           </button>
         ))}
+      </div>
+
+      <div className="mb-6">
+        <StandingsTable groupLetter={selectedGroup} />
       </div>
 
       {groupMatches.length === 0 ? (
