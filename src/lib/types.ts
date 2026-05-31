@@ -14,12 +14,15 @@ export interface League {
 
 export interface Match {
   id: string;
+  match_number: number;
   home_team: string;
   away_team: string;
   kickoff_time: string; // ISO string
   home_score: number | null;
   away_score: number | null;
   status: 'pending' | 'in_progress' | 'finished';
+  stage: string;
+  group_letter: string | null;
 }
 
 export interface Prediction {

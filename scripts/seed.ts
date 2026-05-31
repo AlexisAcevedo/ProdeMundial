@@ -19,8 +19,20 @@ async function main() {
   const dataDir = path.resolve(process.cwd(), 'data');
   const teamsCsv = fs.readFileSync(path.join(dataDir, 'teams.csv'), 'utf-8');
   const matchesCsv = fs.readFileSync(path.join(dataDir, 'matches.csv'), 'utf-8');
+  const stagesCsv = fs.readFileSync(path.join(dataDir, 'tournament_stages.csv'), 'utf-8');
 
-  // 1. Mapear los Equipos (ID -> Nombre)
+  // 1. Mapear Stages (ID -> Nombre)
+  const stagesMap = new Map<string, string>();
+  const stageLines = stagesCsv.trim().split('\n').slice(1);
+  for (const line of stageLines) {
+    const parts = line.split(',');
+    if (parts.length >= 2) {
+      stagesMap.set(parts[0], parts[1]);
+    }
+  }
+  console.log(`✅ ${stagesMap.size} stages cargados en memoria.`);
+
+  // 2. Mapear los Equipos (ID -> Nombre)
   const teamsMap = new Map<string, string>();
   const teamLines = teamsCsv.trim().split('\n').slice(1);
   for (const line of teamLines) {
@@ -33,7 +45,7 @@ async function main() {
 
   console.log(`✅ ${teamsMap.size} equipos cargados en memoria.`);
 
-  // 2. Mapear los Partidos
+  // 3. Mapear los Partidos
   const matchLines = matchesCsv.trim().split('\n').slice(1);
   const matchesToInsert = [];
 
@@ -43,10 +55,12 @@ async function main() {
     
     // El CSV de matches tiene: id,match_number,home_team_id,away_team_id,city_id,stage_id,kickoff_at,match_label
     const id = parseInt(parts[0]);
+    const matchNumber = parseInt(parts[1]);
     const home_team_id = parts[2];
     const away_team_id = parts[3];
+    const stageId = parts[5];
     const kickoff_at = parts[6];
-    const match_label = parts[7];
+    const match_label = parts[7].trim();
 
     // Generamos un UUID determinista usando el id numérico del partido para hacer el script idempotent
     const matchId = `00000000-0000-0000-0000-${id.toString().padStart(12, '0')}`;
@@ -67,20 +81,33 @@ async function main() {
       }
     }
 
+    // Resolver stage name
+    const stage = stagesMap.get(stageId) || 'Group Stage';
+
+    // Extraer group_letter del match_label (ej: "Group A" -> "A")
+    let group_letter: string | null = null;
+    const groupMatch = match_label.match(/^Group\s+([A-L])$/);
+    if (groupMatch) {
+      group_letter = groupMatch[1];
+    }
+
     matchesToInsert.push({
       id: matchId,
+      match_number: matchNumber,
       home_team,
       away_team,
       kickoff_time: kickoff_at,
       home_score: null,
       away_score: null,
-      status: 'pending'
+      status: 'pending',
+      stage,
+      group_letter,
     });
   }
 
   console.log(`⚙️ Preparando inserción de ${matchesToInsert.length} partidos a Supabase...`);
 
-  // 3. Insertar en lotes (batching) para no saturar la red ni la API
+  // 4. Insertar en lotes (batching) para no saturar la red ni la API
   const BATCH_SIZE = 20;
   for (let i = 0; i < matchesToInsert.length; i += BATCH_SIZE) {
     const batch = matchesToInsert.slice(i, i + BATCH_SIZE);
