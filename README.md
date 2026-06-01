@@ -105,8 +105,8 @@ Toda la seguridad del sistema está blindada a nivel de base de datos. Incluso s
 
 ## Documentación Adicional
 
-*   [Arquitectura del Proyecto](file:///E:/Alexis/Programacion/proyectos/ProdeMundial/docs/architecture.md)
-*   [Base de Datos y Reglas (RLS)](file:///E:/Alexis/Programacion/proyectos/ProdeMundial/docs/database.md)
+*   [Arquitectura del Proyecto](./docs/architecture.md)
+*   [Base de Datos y Reglas (RLS)](./docs/database.md)
 
 ---
 
