@@ -42,10 +42,10 @@ Esta arquitectura transaccional de triggers garantiza coherencia sin importar cu
 
 ## 4. Gestión de Migraciones
 
-Todas las modificaciones de base de datos, políticas, triggers y funciones RPC se estructuran como scripts SQL dentro del directorio [supabase/migrations/](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/supabase/migrations).
+Todas las modificaciones de base de datos, políticas, triggers y funciones RPC se estructuran como scripts SQL dentro del directorio [../supabase/migrations/](../supabase/migrations/).
 
 > [!IMPORTANT]
 > **Procedimiento de Despliegue en Producción**:
-> Al carecer de un pipeline de CLI automatizado (GitHub Actions/Supabase CLI), cada archivo `.sql` en el directorio de migraciones debe ser copiado y ejecutado manualmente a través del **SQL Editor** del Panel de Control de Supabase.
->
-> Asegurate de haber ejecutado todas las migraciones en orden (o al menos las funciones específicas como `get_league_stats.sql` y `get_league_standings.sql`) para que la aplicación frontend funcione correctamente y no arroje errores de consulta RPC en la interfaz.
+> Al utilizar el entorno de trabajo **Antigravity IDE (MCP)**, la ejecución de los scripts `.sql` se automatiza completamente. El agente IA utiliza el MCP de Supabase para aplicar migraciones directamente a la base de datos de producción mediante la API, evitando tener que usar el SQL Editor.
+> 
+> *Nota para despliegues manuales sin MCP*: En caso de no contar con el agente, cada archivo `.sql` en el directorio de migraciones debe ser copiado y ejecutado manualmente a través del **SQL Editor** del Panel de Control de Supabase en orden secuencial.
