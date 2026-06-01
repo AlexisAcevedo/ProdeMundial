@@ -46,3 +46,6 @@ secrets.json
 .temp/
 supabase/.temp/
 .eslintcache
+
+# Vercel
+vercel-recovery*

@@ -16,6 +16,7 @@ export function useGlobalStandings() {
   const [standings, setStandings] = useState<GlobalStanding[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [trigger, setTrigger] = useState(0);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -39,6 +40,23 @@ export function useGlobalStandings() {
     }
 
     fetchStandings();
+  }, [trigger]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`global-standings-realtime-${Math.random()}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'predictions' },
+        () => {
+          setTrigger((t) => t + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const userIndex = standings.findIndex((s) => s.user_id === user?.id);

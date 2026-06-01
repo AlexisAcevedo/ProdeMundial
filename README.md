@@ -11,6 +11,8 @@ Plataforma moderna y reactiva de pronósticos deportivos (prodes) diseñada para
     *   Creación de ligas privadas con generación automática de códigos de invitación únicos.
     *   Unión a ligas existentes ingresando el código de invitación.
     *   Tablas de clasificación en tiempo real para ligas individuales y un ranking global.
+    *   Muro interactivo de conversacion (Trash Talk) en tiempo real para los participantes de cada liga.
+    *   Comparador publico de pronosticos entre participantes (visible solo 30 minutos antes del partido).
     *   Estadísticas detalladas de rendimiento por liga y opción para compartir accesos rápidamente.
 *   **Pronósticos de Partidos**:
     *   Carga masiva y edición individual de predicciones de marcador exacto para la fase de grupos y eliminatorias.

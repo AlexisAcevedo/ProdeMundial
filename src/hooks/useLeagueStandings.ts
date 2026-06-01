@@ -55,7 +55,7 @@ export function useLeagueStandings(leagueId: string | null) {
     if (!leagueId) return;
 
     const channel = supabase
-      .channel(`league-standings-realtime-${leagueId}`)
+      .channel(`league-standings-realtime-${leagueId}-${Math.random()}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'predictions' },
