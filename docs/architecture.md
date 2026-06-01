@@ -7,7 +7,8 @@ ProdeMundial es una aplicación web moderna de arquitectura **desacoplada y cent
 Al integrar Supabase directamente desde el cliente React logramos:
 1. **Reducción de Latencia y Complejidad**: No hay una capa de servidor/API intermedia (como Node.js o Python) que mantener.
 2. **Seguridad Inquebrantable**: Toda la validación de seguridad de los datos ocurre directamente en el motor de PostgreSQL a través de *Row Level Security* (RLS).
-3. **Desarrollo Ágil**: Permite a los desarrolladores enfocarse casi exclusivamente en la Experiencia de Usuario (UX) en el frontend.
+3. **Tiempo Real Nativo**: Sincronización instantánea de puntajes y chats (Trash Talk) mediante WebSocket vía Supabase Realtime, sin infraestructuras adicionales complejas.
+4. **Desarrollo Ágil**: Permite a los desarrolladores enfocarse casi exclusivamente en la Experiencia de Usuario (UX) en el frontend.
 
 ## Diagrama de Flujo
 
@@ -19,8 +20,10 @@ graph TD
     
     SBClient -->|Autenticación| SBAuth[Supabase Auth - Google OAuth]
     SBClient -->|Datos y Reglas RLS| SBDB[Base de Datos PostgreSQL]
+    SBClient -->|WebSockets| SBRealtime[Supabase Realtime]
     
     SBDB -->|Triggers SQL| Score[Motor de Puntaje Automatizado]
+    SBDB -->|Postgres Changes| SBRealtime
 ```
 
 ## Estructura del Frontend

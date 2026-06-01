@@ -9,6 +9,7 @@ La seguridad y la integridad transaccional de ProdeMundial residen 100% en su ba
 - **`league_members`**: Tabla relacional (*many-to-many*) que define qué usuario pertenece a qué liga.
 - **`matches`**: Contiene la lista central de los partidos reales del torneo. Maneja su propio estado (`pending`, `in_progress`, `finished`) y registra la hora de inicio (`kickoff_time`).
 - **`predictions`**: Registra los pronósticos de marcador exacto realizados por cada usuario.
+- **`league_comments`**: Muro de interactividad social ("Trash Talk"). Registra los mensajes en tiempo real vinculados a una liga.
 
 ## 2. Row Level Security (RLS)
 
