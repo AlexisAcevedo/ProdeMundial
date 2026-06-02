@@ -12,6 +12,7 @@ Plataforma moderna y reactiva de pronósticos deportivos (prodes) diseñada para
     *   Unión a ligas existentes ingresando el código de invitación.
     *   Tablas de clasificación en tiempo real para ligas individuales y un ranking global con soporte para avatares de usuario.
     *   Muro interactivo de conversacion (Trash Talk) en tiempo real para los participantes de cada liga.
+    *   Premios y Estadísticas automáticas (Rey del Exacto, Mejor Racha, El Optimista, Más Consistente).
     *   Comparador publico de pronosticos entre participantes (visible solo 30 minutos antes del partido).
     *   Estadísticas detalladas de rendimiento por liga y opción para compartir accesos rápidamente.
 *   **Pronósticos de Partidos**:

@@ -43,5 +43,5 @@ body {
 }
 
 .glass-card {
-  @apply bg-white/80 backdrop-blur-sm border border-slate-100 shadow-sm dark:bg-slate-800/50 dark:border-slate-700/50 transition-all duration-300;
+  @apply bg-white/80 backdrop-blur-sm border border-slate-300 shadow-sm dark:bg-slate-800/50 dark:border-slate-700/50 transition-all duration-300;
 }

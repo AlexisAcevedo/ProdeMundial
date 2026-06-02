@@ -78,11 +78,11 @@ export function BracketMatchCard({
     <div
       className={`bracket-match rounded-xl border bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.02] dark:bg-slate-800/80 relative z-10 ${
         isFinished
-          ? 'border-slate-200 dark:border-slate-700'
-          : 'border-brand-200 dark:border-brand-800/60 shadow-[0_0_12px_rgba(139,92,246,0.05)]'
+          ? 'border-slate-300 dark:border-slate-700'
+          : 'border-brand-300 dark:border-brand-800/60 shadow-[0_0_12px_rgba(139,92,246,0.05)]'
       } ${compact ? 'p-1.5' : 'p-2'}`}
     >
-      <p className="mb-1 text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+      <p className="mb-1 text-[8px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-500">
         {dateStr}
       </p>
 
@@ -166,7 +166,7 @@ export function BracketMatchCard({
       )}
 
       {isPastCutoff && !isFinished && !canPredict && (
-        <p className="mt-2 text-[9px] text-slate-400 dark:text-slate-500 text-center font-medium">Cerrado</p>
+        <p className="mt-2 text-[9px] text-slate-600 dark:text-slate-500 text-center font-medium">Cerrado</p>
       )}
     </div>
   );
@@ -244,11 +244,11 @@ export function TournamentBracket({
             className="flex flex-col flex-1 min-w-[110px] max-w-[130px]"
           >
             {/* Stage Header */}
-            <div className="mb-2 text-center">
-              <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <div className="mb-3 text-center">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-500">
                 {col.label}
               </h4>
-              <p className="text-[8px] text-slate-400 dark:text-slate-500">
+              <p className="text-[10px] text-slate-600 dark:text-slate-500 mt-0.5">
                 {col.matches.length} {col.matches.length === 1 ? 'partido' : 'partidos'}
               </p>
             </div>
@@ -269,8 +269,8 @@ export function TournamentBracket({
                   {/* Sends to right (R32, R16, QF) */}
                   {colIdx < 3 ? (
                     <>
-                      <div className="absolute right-0 top-1/2 hidden h-px w-2 translate-x-full bg-slate-300 dark:bg-slate-700 lg:block" />
-                      <div className={`absolute right-[-8px] hidden w-px bg-slate-300 dark:bg-slate-700 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
+                      <div className="absolute right-0 top-1/2 hidden h-px w-2 translate-x-full bg-slate-500 dark:bg-slate-700 lg:block" />
+                      <div className={`absolute right-[-8px] hidden w-px bg-slate-500 dark:bg-slate-700 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
                     </>
                   ) : (
                     // SF sends to Final
@@ -280,7 +280,7 @@ export function TournamentBracket({
                   )}
                   {/* Receives from left (R16, QF, SF) */}
                   {colIdx > 0 && (
-                    <div className="absolute left-0 top-1/2 hidden h-px w-2 -translate-x-full bg-slate-300 dark:bg-slate-700 lg:block" />
+                    <div className="absolute left-0 top-1/2 hidden h-px w-2 -translate-x-full bg-slate-500 dark:bg-slate-700 lg:block" />
                   )}
                 </div>
                 );
@@ -317,8 +317,8 @@ export function TournamentBracket({
           </div>
 
           {/* Third Place */}
-          <div className="w-full border-t border-slate-200/60 dark:border-slate-700 pt-6">
-            <h4 className="text-center text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+          <div className="w-full border-t border-slate-300 dark:border-slate-700 pt-6">
+            <h4 className="text-center text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-500 mb-2">
               Tercer Puesto
             </h4>
             {thirdPlaceMatch ? (
@@ -343,11 +343,11 @@ export function TournamentBracket({
             className="flex flex-col flex-1 min-w-[110px] max-w-[130px]"
           >
             {/* Stage Header */}
-            <div className="mb-2 text-center">
-              <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <div className="mb-3 text-center">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-500">
                 {col.label}
               </h4>
-              <p className="text-[8px] text-slate-400 dark:text-slate-500">
+              <p className="text-[10px] text-slate-600 dark:text-slate-500 mt-0.5">
                 {col.matches.length} {col.matches.length === 1 ? 'partido' : 'partidos'}
               </p>
             </div>
@@ -368,8 +368,8 @@ export function TournamentBracket({
                   {/* Sends to left (R32, R16, QF) */}
                   {colIdx > 0 ? (
                     <>
-                      <div className="absolute left-0 top-1/2 hidden h-px w-2 -translate-x-full bg-slate-300 dark:bg-slate-700 lg:block" />
-                      <div className={`absolute left-[-8px] hidden w-px bg-slate-300 dark:bg-slate-700 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
+                      <div className="absolute left-0 top-1/2 hidden h-px w-2 -translate-x-full bg-slate-500 dark:bg-slate-700 lg:block" />
+                      <div className={`absolute left-[-8px] hidden w-px bg-slate-500 dark:bg-slate-700 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
                     </>
                   ) : (
                     // SF sends to Final
@@ -379,7 +379,7 @@ export function TournamentBracket({
                   )}
                   {/* Receives from right (R16, QF, SF) */}
                   {colIdx < 3 && (
-                    <div className="absolute right-0 top-1/2 hidden h-px w-2 translate-x-full bg-slate-300 dark:bg-slate-700 lg:block" />
+                    <div className="absolute right-0 top-1/2 hidden h-px w-2 translate-x-full bg-slate-500 dark:bg-slate-700 lg:block" />
                   )}
                 </div>
                 );

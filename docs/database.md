@@ -41,7 +41,15 @@ El trigger `on_match_finished` se dispara cuando la fila de un partido (`matches
 
 Esta arquitectura transaccional de triggers garantiza coherencia sin importar cuántos miles de usuarios estén participando simultáneamente.
 
-## 4. Gestión de Migraciones
+## 4. Estadísticas y Premios Avanzados (RPCs)
+
+Además de calcular el puntaje base, el sistema utiliza Stored Procedures (RPCs) como `get_league_stats`. Estas funciones aprovechan el motor analítico de PostgreSQL (Window Functions, `STDDEV`, agrupaciones) para calcular métricas complejas en tiempo real, procesando la carga en el servidor para entregar al frontend resultados limpios:
+- **Rey del Exacto**: Mayor cantidad de aciertos exactos.
+- **El Optimista**: Suma de goles totales pronosticados.
+- **Más Consistente**: Menor desviación estándar en el historial de puntos.
+- **Mejor Racha**: Partidos consecutivos (por `kickoff_time`) sumando puntos.
+
+## 5. Gestión de Migraciones
 
 Todas las modificaciones de base de datos, políticas, triggers y funciones RPC se estructuran como scripts SQL dentro del directorio [../supabase/migrations/](../supabase/migrations/).
 
