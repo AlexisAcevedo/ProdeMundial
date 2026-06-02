@@ -118,9 +118,13 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 font-bold shadow-inner border border-white/20 dark:border-white/5">
-                              {participant.name ? participant.name.charAt(0).toUpperCase() : (participant.email?.charAt(0).toUpperCase() || '?')}
-                            </div>
+                            {participant.avatar_url ? (
+                              <img src={participant.avatar_url} alt={participant.name || 'Avatar'} className="h-10 w-10 rounded-xl object-cover shadow-inner border border-white/20 dark:border-white/5" />
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 font-bold shadow-inner border border-white/20 dark:border-white/5">
+                                {participant.name ? participant.name.charAt(0).toUpperCase() : (participant.email?.charAt(0).toUpperCase() || '?')}
+                              </div>
+                            )}
                             <div>
                               <div className="font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                                 {participant.name || participant.email?.split('@')[0] || 'Usuario'}
