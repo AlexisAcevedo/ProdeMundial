@@ -5,7 +5,7 @@ export function GlobalStandings() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-2xl border border-slate-200/50 bg-white/50 dark:border-white/5 dark:bg-white/5 backdrop-blur-sm">
+      <div key="loading" className="flex h-64 items-center justify-center rounded-2xl border border-slate-200/50 bg-white/50 dark:border-white/5 dark:bg-white/5 backdrop-blur-sm">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-500 border-t-transparent"></div>
           <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Cargando ranking global...</span>
@@ -16,7 +16,7 @@ export function GlobalStandings() {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-red-200/50 bg-red-50/10 p-6 text-center text-red-500 dark:border-red-900/30">
+      <div key="error" className="rounded-2xl border border-red-200/50 bg-red-50/10 p-6 text-center text-red-500 dark:border-red-900/30">
         Error al cargar ranking global: {error.message}
       </div>
     );
@@ -25,7 +25,7 @@ export function GlobalStandings() {
   const totalParticipants = standings.length;
 
   return (
-    <div className="space-y-6">
+    <div key="content" className="space-y-6">
       {/* Stats rápidas */}
       <div className="grid grid-cols-2 gap-4">
         <div className="glass-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between min-h-[100px] z-10 border border-slate-200/50 dark:border-white/5">

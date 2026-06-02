@@ -184,7 +184,7 @@ export function Dashboard() {
               Partidos
             </h2>
             
-            {pendingCount > 0 && activeTab !== 'bulk' && (
+            {pendingCount > 0 && (
               <div className="mb-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 flex items-center justify-between gap-4 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl animate-pulse">⚡</span>
@@ -193,12 +193,14 @@ export function Dashboard() {
                     <p className="text-xs text-amber-700/80 dark:text-amber-300/80">Te quedan {pendingCount} {pendingCount === 1 ? 'partido' : 'partidos'} por pronosticar.</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => setActiveTab('bulk')}
-                  className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white px-4 py-2 text-xs font-bold shadow-sm transition-all"
-                >
-                  Pronosticar ahora
-                </button>
+                {activeTab !== 'bulk' && (
+                  <button
+                    onClick={() => setActiveTab('bulk')}
+                    className="shrink-0 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white px-4 py-2 text-xs font-bold shadow-sm transition-all"
+                  >
+                    Pronosticar ahora
+                  </button>
+                )}
               </div>
             )}
 
