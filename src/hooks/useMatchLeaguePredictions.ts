@@ -3,8 +3,7 @@ import { supabase } from '../lib/supabase';
 
 export interface UserPrediction {
   user_id: string;
-  name: string | null;
-  email: string;
+  display_name: string;
   prediction: {
     home_score: number;
     away_score: number;
@@ -63,10 +62,11 @@ export function useMatchLeaguePredictions(leagueId: string | null, matchId: stri
 
         const results: UserPrediction[] = ((members || []) as unknown as LeagueMemberQueryResult[]).map((m) => {
           const pred = predMap.get(m.user_id);
+          const emailPrefix = m.user?.email ? m.user.email.split('@')[0].substring(0, 5) : 'Participante';
+          
           return {
             user_id: m.user_id,
-            name: m.user?.name || null,
-            email: m.user?.email || '',
+            display_name: m.user?.name || emailPrefix,
             prediction: pred
               ? {
                   home_score: pred.home_score,
@@ -81,9 +81,7 @@ export function useMatchLeaguePredictions(leagueId: string | null, matchId: stri
         results.sort((a, b) => {
           if (a.prediction && !b.prediction) return -1;
           if (!a.prediction && b.prediction) return 1;
-          const nameA = a.name || a.email;
-          const nameB = b.name || b.email;
-          return nameA.localeCompare(nameB);
+          return a.display_name.localeCompare(b.display_name);
         });
 
         setPredictions(results);

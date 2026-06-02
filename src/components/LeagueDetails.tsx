@@ -119,19 +119,16 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             {participant.avatar_url ? (
-                              <img src={participant.avatar_url} alt={participant.name || 'Avatar'} className="h-10 w-10 rounded-xl object-cover shadow-inner border border-white/20 dark:border-white/5" />
+                              <img src={participant.avatar_url} alt={participant.display_name || 'Avatar'} className="h-10 w-10 rounded-xl object-cover shadow-inner border border-white/20 dark:border-white/5" />
                             ) : (
                               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 font-bold shadow-inner border border-white/20 dark:border-white/5">
-                                {participant.name ? participant.name.charAt(0).toUpperCase() : (participant.email?.charAt(0).toUpperCase() || '?')}
+                                {participant.display_name?.charAt(0).toUpperCase() || '?'}
                               </div>
                             )}
                             <div>
                               <div className="font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-                                {participant.name || participant.email?.split('@')[0] || 'Usuario'}
+                                {participant.display_name || 'Usuario'}
                               </div>
-                              {participant.name && (
-                                <div className="text-xs text-slate-500 dark:text-slate-400">{participant.email}</div>
-                              )}
                             </div>
                           </div>
                         </td>
@@ -144,7 +141,7 @@ export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
                           <td className="px-6 py-4 text-right">
                             {participant.user_id !== user?.id && (
                               <button
-                                onClick={() => handleKickMember(participant.user_id, participant.name || participant.email)}
+                                onClick={() => handleKickMember(participant.user_id, participant.display_name)}
                                 disabled={isAdminActionLoading}
                                 className="text-red-500 hover:text-red-400 transition-colors p-1"
                                 title="Expulsar de la liga"

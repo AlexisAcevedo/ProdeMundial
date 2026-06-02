@@ -93,17 +93,14 @@ export function GlobalStandings() {
                             <img src={participant.avatar_url} alt="" className="h-10 w-10 rounded-xl object-cover border border-slate-200 dark:border-white/10" />
                           ) : (
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 font-bold shadow-inner border border-white/20 dark:border-white/5">
-                              {participant.name ? participant.name.charAt(0).toUpperCase() : participant.email.charAt(0).toUpperCase()}
+                              {participant.display_name.charAt(0).toUpperCase()}
                             </div>
                           )}
                           <div>
                             <div className={`font-bold text-slate-900 dark:text-white transition-colors ${isCurrentUser ? 'text-brand-600 dark:text-brand-400' : 'group-hover:text-brand-600 dark:group-hover:text-brand-400'}`}>
-                              {participant.name || participant.email.split('@')[0]}
+                              {participant.display_name}
                               {isCurrentUser && <span className="ml-2 text-xs bg-brand-500 text-white px-1.5 py-0.5 rounded font-bold">Tú</span>}
                             </div>
-                            {participant.name && (
-                              <div className="text-xs text-slate-500 dark:text-slate-400">{participant.email}</div>
-                            )}
                           </div>
                         </div>
                       </td>

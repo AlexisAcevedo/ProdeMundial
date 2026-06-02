@@ -4,8 +4,7 @@ import { useAuth } from './useAuth';
 
 export interface GlobalStanding {
   user_id: string;
-  email: string;
-  name: string | null;
+  display_name: string;
   avatar_url: string | null;
   total_points: number;
   exact_count: number;

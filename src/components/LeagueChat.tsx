@@ -85,14 +85,14 @@ export function LeagueChat({ leagueId }: LeagueChatProps) {
                     <img src={msg.user.avatar_url} alt="Avatar" className="w-8 h-8 rounded-xl object-cover border border-slate-200 dark:border-white/10" />
                   ) : (
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold text-sm border border-slate-200 dark:border-white/5">
-                      {msg.user?.name ? msg.user.name.charAt(0).toUpperCase() : (msg.user?.email ? msg.user.email.charAt(0).toUpperCase() : '?')}
+                      {msg.user?.display_name ? msg.user.display_name.charAt(0).toUpperCase() : '?'}
                     </div>
                   )}
                 </div>
                 <div className={`flex flex-col max-w-[75%] ${isMe ? 'items-end' : 'items-start'}`}>
                   <div className="flex items-center gap-1.5 px-1">
                     <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                      {isMe ? 'Vos' : msg.user?.name || msg.user?.email?.split('@')[0] || 'Participante'}
+                      {isMe ? 'Vos' : msg.user?.display_name || 'Participante'}
                     </span>
                     <span className="text-[10px] text-slate-400 dark:text-slate-500">
                       {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

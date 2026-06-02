@@ -9,8 +9,7 @@ export interface ChatMessage {
   content: string;
   created_at: string;
   user: {
-    name: string | null;
-    email: string;
+    display_name: string;
     avatar_url: string | null;
   };
 }
@@ -60,7 +59,10 @@ export function useLeagueChat(leagueId: string | null) {
             user_id: msg.user_id,
             content: msg.content,
             created_at: msg.created_at,
-            user: u || { name: 'Participante', email: '', avatar_url: null },
+            user: {
+              display_name: u?.name || (u?.email ? u.email.split('@')[0].substring(0, 5) : 'Participante'),
+              avatar_url: u?.avatar_url || null
+            },
           };
         });
 
@@ -101,7 +103,10 @@ export function useLeagueChat(leagueId: string | null) {
             user_id: newComment.user_id,
             content: newComment.content,
             created_at: newComment.created_at,
-            user: userData || { name: 'Participante', email: '', avatar_url: null },
+            user: {
+              display_name: userData?.name || (userData?.email ? userData.email.split('@')[0].substring(0, 5) : 'Participante'),
+              avatar_url: userData?.avatar_url || null
+            },
           };
 
           setMessages((prev) => [...prev, messageWithUser]);

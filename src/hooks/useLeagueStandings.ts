@@ -3,8 +3,7 @@ import { supabase } from '../lib/supabase';
 
 export interface LeagueStanding {
   user_id: string;
-  email: string;
-  name: string | null;
+  display_name: string;
   avatar_url: string | null;
   total_points: number;
 }

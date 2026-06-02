@@ -104,14 +104,13 @@ export function MatchPredictionsModal({ leagueId, leagueName, match, onClose }: 
                   <div key={p.user_id} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500/10 to-accent-teal/10 text-brand-600 dark:text-brand-400 font-bold border border-white/20 dark:border-white/5">
-                        {p.name ? p.name.charAt(0).toUpperCase() : (p.email?.charAt(0).toUpperCase() || '?')}
+                        {p.display_name?.charAt(0).toUpperCase() || '?'}
                       </div>
                       <div>
                         <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 text-sm">
-                          {p.name || p.email?.split('@')[0] || 'Usuario'}
+                          {p.display_name || 'Usuario'}
                           {isMe && <span className="text-[10px] bg-slate-100 dark:bg-white/10 px-1.5 py-0.2 rounded font-normal text-slate-500 dark:text-slate-400">Vos</span>}
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">{p.email}</div>
                       </div>
                     </div>
 

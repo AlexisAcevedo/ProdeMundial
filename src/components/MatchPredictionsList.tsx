@@ -51,7 +51,7 @@ export function MatchPredictionsList({ matchId, isPastCutoff, isFinished }: Matc
       <div className="max-h-48 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
         {otherPredictions.map((pred) => {
           const profile = pred.users;
-          const displayName = profile?.name || profile?.email.split('@')[0] || 'Usuario';
+          const displayName = profile?.display_name || 'Usuario';
           const avatarUrl = profile?.avatar_url;
 
           return (

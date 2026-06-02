@@ -9,8 +9,7 @@ export interface MatchPrediction {
   user_id: string;
   users: {
     id: string;
-    name: string | null;
-    email: string;
+    display_name: string;
     avatar_url: string | null;
   } | null;
 }
@@ -51,15 +50,24 @@ export function useMatchPredictions(matchId: string, isPastCutoff: boolean) {
           throw error;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const formattedData = (data || []).map((item: any) => ({
-          id: item.id,
-          home_score: item.home_score,
-          away_score: item.away_score,
-          points: item.points,
-          user_id: item.user_id,
-          users: Array.isArray(item.users) ? item.users[0] : item.users,
-        }));
+        const formattedData = (data || []).map((item: any) => {
+          const userObj = Array.isArray(item.users) ? item.users[0] : item.users;
+          const emailPrefix = userObj?.email ? userObj.email.split('@')[0].substring(0, 5) : 'Participante';
+          const displayName = userObj?.name || emailPrefix;
+          
+          return {
+            id: item.id,
+            home_score: item.home_score,
+            away_score: item.away_score,
+            points: item.points,
+            user_id: item.user_id,
+            users: userObj ? {
+              id: userObj.id,
+              display_name: displayName,
+              avatar_url: userObj.avatar_url
+            } : null,
+          };
+        });
 
         setPredictions(formattedData);
       } catch (e: unknown) {
