@@ -49,3 +49,6 @@ supabase/.temp/
 
 # Vercel
 vercel-recovery*
+ \
+playwright-report/\
+test-results/

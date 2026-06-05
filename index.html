@@ -17,6 +17,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
+          if (window.E2E_TESTING) return; // Desactivar en tests E2E para no romper mocks de Playwright
           navigator.serviceWorker.register('/sw.js')
             .then((reg) => console.log('Service Worker registrado:', reg.scope))
             .catch((err) => console.error('Error al registrar SW:', err));
