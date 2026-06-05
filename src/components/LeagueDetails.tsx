@@ -8,20 +8,19 @@ import { useToast } from '../contexts/ToastContext';
 import { StandingRowSkeleton } from './Skeleton';
 import { LeagueStats } from './LeagueStats';
 import { LeagueChat } from './LeagueChat';
-import { useMatches } from '../hooks/useMatches';
 import { MatchPredictionsModal } from './MatchPredictionsModal';
 
 interface LeagueDetailsProps {
   league: League;
+  matches: Match[];
   onBack: () => void;
 }
 
-export function LeagueDetails({ league, onBack }: LeagueDetailsProps) {
+export function LeagueDetails({ league, matches, onBack }: LeagueDetailsProps) {
   const { standings, isLoading, error } = useLeagueStandings(league.id);
   const { user } = useAuth();
   const { removeMember, deleteLeague, isLoading: isAdminActionLoading } = useLeagueAdmin();
   const { addToast } = useToast();
-  const { matches } = useMatches();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
 
   const isOwner = league.owner_id === user?.id;

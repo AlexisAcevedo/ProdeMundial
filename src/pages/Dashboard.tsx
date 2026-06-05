@@ -177,7 +177,7 @@ export function Dashboard() {
 
       <main className="mx-auto w-full max-w-[1920px] p-4 sm:px-6 lg:px-8 md:py-8 relative z-10">
         {selectedLeague ? (
-          <LeagueDetails league={selectedLeague} onBack={() => setSelectedLeague(null)} />
+          <LeagueDetails league={selectedLeague} matches={matches} onBack={() => setSelectedLeague(null)} />
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1fr_240px] xl:grid-cols-[1fr_280px]">
             <div className="min-w-0">
