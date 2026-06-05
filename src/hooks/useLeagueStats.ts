@@ -5,7 +5,6 @@ export interface LeagueStatItem {
   metric: 'exact_king' | 'optimist' | 'consistent' | 'streak';
   user_id: string;
   user_name: string | null;
-  user_email: string;
   user_avatar_url: string | null;
   value: number;
 }
@@ -53,18 +52,23 @@ export function useLeagueStats(leagueId: string | null) {
   useEffect(() => {
     if (!leagueId) return;
 
+    let timeoutId: number;
+    const debouncedTrigger = () => {
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => setTrigger((t) => t + 1), 400);
+    };
+
     const channel = supabase
-      .channel(`league-stats-realtime-${leagueId}-${Math.random()}`)
+      .channel(`league-stats-realtime-${leagueId}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'predictions' },
-        () => {
-          setTrigger((t) => t + 1);
-        }
+        debouncedTrigger
       )
       .subscribe();
 
     return () => {
+      window.clearTimeout(timeoutId);
       supabase.removeChannel(channel);
     };
   }, [leagueId]);

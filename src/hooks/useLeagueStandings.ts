@@ -53,25 +53,28 @@ export function useLeagueStandings(leagueId: string | null) {
   useEffect(() => {
     if (!leagueId) return;
 
+    let timeoutId: number;
+    const debouncedTrigger = () => {
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => setTrigger((t) => t + 1), 400);
+    };
+
     const channel = supabase
-      .channel(`league-standings-realtime-${leagueId}-${Math.random()}`)
+      .channel(`league-standings-realtime-${leagueId}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'predictions' },
-        () => {
-          setTrigger((t) => t + 1);
-        }
+        debouncedTrigger
       )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'league_members', filter: `league_id=eq.${leagueId}` },
-        () => {
-          setTrigger((t) => t + 1);
-        }
+        debouncedTrigger
       )
       .subscribe();
 
     return () => {
+      window.clearTimeout(timeoutId);
       supabase.removeChannel(channel);
     };
   }, [leagueId]);

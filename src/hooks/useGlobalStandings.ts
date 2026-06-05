@@ -42,18 +42,23 @@ export function useGlobalStandings() {
   }, [trigger]);
 
   useEffect(() => {
+    let timeoutId: number;
+    const debouncedTrigger = () => {
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => setTrigger((t) => t + 1), 400);
+    };
+
     const channel = supabase
-      .channel(`global-standings-realtime-${Math.random()}`)
+      .channel('global-standings-realtime')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'predictions' },
-        () => {
-          setTrigger((t) => t + 1);
-        }
+        debouncedTrigger
       )
       .subscribe();
 
     return () => {
+      window.clearTimeout(timeoutId);
       supabase.removeChannel(channel);
     };
   }, []);

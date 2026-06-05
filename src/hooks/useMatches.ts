@@ -36,7 +36,7 @@ export function useMatches() {
     fetchMatches();
 
     const channel = supabase
-      .channel(`matches-realtime-${Math.random()}`)
+      .channel('matches-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, (payload) => {
         if (payload.eventType === 'INSERT') {
           const newMatch = payload.new as Match;

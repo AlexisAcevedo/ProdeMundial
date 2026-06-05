@@ -117,7 +117,7 @@ export function LeagueStats({ leagueId }: LeagueStatsProps) {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((card) => {
-          const winnerName = card.data?.user_name || card.data?.user_email?.split('@')[0] || 'Nadie';
+          const winnerName = card.data?.user_name || 'Nadie';
           const hasWinner = !!card.data;
 
           return (

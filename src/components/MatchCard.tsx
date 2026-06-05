@@ -13,6 +13,14 @@ export function TeamFlag({ teamName, className = '' }: { teamName: string; class
   return <span className={`fi fi-${code} shrink-0 shadow-sm rounded-[2px] ${className}`} style={{ width: '1.25em', height: '0.9375em' }} />;
 }
 
+const dateFormatter = new Intl.DateTimeFormat('es', {
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
 export function MatchCard({ match, prediction, onSubmit }: { match: Match, prediction?: Prediction, onSubmit: (matchId: string, home: number, away: number) => Promise<void> }) {
   const [homeScore, setHomeScore] = useState<string>(prediction?.home_score?.toString() ?? '');
   const [awayScore, setAwayScore] = useState<string>(prediction?.away_score?.toString() ?? '');
@@ -57,13 +65,7 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
     }
   };
 
-  const formatter = new Intl.DateTimeFormat('es', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+
 
   return (
     <div className="flex flex-col h-full rounded-2xl glass-card p-5 group hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 dark:hover:shadow-brand-500/5 relative overflow-hidden">
@@ -78,7 +80,7 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
       <div className="mb-5 flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
         <span className="flex items-center gap-1.5">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-          {formatter.format(new Date(match.kickoff_time))}
+          {dateFormatter.format(new Date(match.kickoff_time))}
         </span>
         {isFinished ? (
           <span className="rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border border-slate-200 dark:border-white/5">

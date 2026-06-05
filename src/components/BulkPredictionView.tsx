@@ -16,6 +16,14 @@ interface TempPrediction {
   isModified: boolean;
 }
 
+const dateFormatter = new Intl.DateTimeFormat('es', {
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
 export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkPredictionViewProps) {
   const { addToast } = useToast();
   const [tempPredictions, setTempPredictions] = useState<Record<string, TempPrediction>>({});
@@ -106,8 +114,8 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
     try {
       const itemsToSubmit = modifiedItems.map((item) => ({
         matchId: item.matchId,
-        homeScore: parseInt(item.homeScore, 10),
-        awayScore: parseInt(item.awayScore, 10),
+        homeScore: Math.max(0, Math.min(99, parseInt(item.homeScore, 10))),
+        awayScore: Math.max(0, Math.min(99, parseInt(item.awayScore, 10))),
       }));
 
       await onSubmitBulk(itemsToSubmit);
@@ -119,13 +127,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
     }
   };
 
-  const formatter = new Intl.DateTimeFormat('es', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+
 
   if (activeMatches.length === 0) {
     return (
@@ -198,7 +200,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
                 {/* Info de partido */}
                 <div className="flex-1 min-w-0 pr-2">
                   <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                    {formatter.format(new Date(match.kickoff_time))} {match.group_letter ? `• Grupo ${match.group_letter}` : ''}
+                    {dateFormatter.format(new Date(match.kickoff_time))} {match.group_letter ? `• Grupo ${match.group_letter}` : ''}
                   </span>
                   
                   <div className="flex items-center gap-2 mt-1 font-bold text-slate-700 dark:text-slate-200 text-xs sm:text-sm truncate">
@@ -219,6 +221,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
                     value={temp.homeScore}
                     onChange={(e) => handleScoreChange(match.id, 'home', e.target.value)}
                     disabled={isSubmitting}
+                    maxLength={2}
                     className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50/50 text-center text-lg font-black outline-none transition-all focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 dark:border-white/10 dark:bg-fifa-dark/50 dark:text-white dark:focus:border-brand-500"
                     placeholder="-"
                   />
@@ -230,6 +233,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
                     value={temp.awayScore}
                     onChange={(e) => handleScoreChange(match.id, 'away', e.target.value)}
                     disabled={isSubmitting}
+                    maxLength={2}
                     className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50/50 text-center text-lg font-black outline-none transition-all focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 dark:border-white/10 dark:bg-fifa-dark/50 dark:text-white dark:focus:border-brand-500"
                     placeholder="-"
                   />

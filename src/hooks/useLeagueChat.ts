@@ -78,7 +78,7 @@ export function useLeagueChat(leagueId: string | null) {
 
     // Suscribir en tiempo real a los inserts de league_comments de esta liga
     const channel = supabase
-      .channel(`league-chat-${leagueId}-${Math.random()}`)
+      .channel(`league-chat-${leagueId}`)
       .on(
         'postgres_changes',
         {
