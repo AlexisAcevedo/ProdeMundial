@@ -1,15 +1,25 @@
 # ProdeMundial
-> Aplicación web React + TypeScript + Supabase para predicciones de resultados de fútbol y ligas privadas.
+> Aplicación web React 19 + TypeScript + Vite 8 + Supabase para predicciones de resultados de fútbol y ligas privadas.
 
 ## Archivos Principales
-- [src/main.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/main.tsx): Punto de entrada y proveedor de autenticación de la App.
-- [src/App.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/App.tsx): Enrutador principal (Decide entre mostrar pantalla de Login o el Dashboard).
-- [src/pages/Dashboard.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/pages/Dashboard.tsx): Vista principal interactiva (partidos, carga de predicciones, ranking, ligas).
-- [src/contexts/AuthContext.tsx](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/contexts/AuthContext.tsx): Contexto de sesión de Supabase y manejo del flujo OAuth con Google.
-- [src/hooks/](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/src/hooks/): Toda la lógica de conexión con Supabase (usePredictions, useLeagues, useMatches, useStandings).
-- [supabase/migrations/schema.sql](file:///e:/Alexis/Programacion/proyectos/ProdeMundial/supabase/migrations/schema.sql): Esquema de BD PostgreSQL, políticas RLS de seguridad y triggers de puntaje automático.
+- [src/main.tsx](src/main.tsx): Punto de entrada. Monta `AuthProvider` y `ToastProvider`.
+- [src/App.tsx](src/App.tsx): Enrutador principal. Decide entre pantalla de Login y Dashboard según sesión.
+- [src/pages/Dashboard.tsx](src/pages/Dashboard.tsx): Vista principal (partidos, predicciones, ranking, ligas, bracket).
+- [src/contexts/AuthContext.tsx](src/contexts/AuthContext.tsx): Sesión de Supabase + flujo OAuth con Google.
+- [src/contexts/ToastContext.tsx](src/contexts/ToastContext.tsx): Notificaciones flotantes globales (toasts).
+- [src/hooks/](src/hooks/): 17 hooks que encapsulan toda la interacción con Supabase (ver lista abajo).
+- [src/lib/](src/lib/): Cliente Supabase configurado y tipos compartidos.
+- [supabase/migrations/schema.sql](supabase/migrations/schema.sql): Esquema base de BD (referencia).
+
+## Hooks Disponibles
+`useAuth`, `useMatches`, `usePredictions`, `usePendingPredictions`, `usePredictionHistory`,
+`useLeagues`, `useLeagueStandings`, `useRealtimeLeagueStandings`, `useLeagueChat`,
+`useLeagueStats`, `useLeagueAdmin`, `useGlobalStandings`, `useStandings`,
+`useMatchPredictions`, `useMatchLeaguePredictions`, `useCountdown`, `useTheme`
 
 ## Conceptos Clave
-- **Regla de 30 minutos (RLS)**: Los pronósticos solo pueden insertarse o actualizarse hasta 30 minutos antes del partido. Esto se impone de forma inviolable mediante Row Level Security (RLS) directamente en la base de datos PostgreSQL de Supabase.
-- **Motor de Puntuación Automatizado**: Los puntos no se calculan en el cliente React. Se usa un trigger (`on_match_finished`) en la BD que calcula los puntos automáticamente: Acierto exacto = 3 pts, Acierto de resultado (ganador/empate) = 1 pt.
-- **Ligas Privadas**: Acceso a competencias gestionado mediante la tabla relacional `league_members`. Se requiere un código único de invitación (`invite_code`) de 6 caracteres para acceder.
+- **Regla de 30 minutos (RLS)**: Los pronósticos solo pueden insertarse/actualizarse hasta 30 minutos antes del partido. Impuesto de forma inviolable por Row Level Security en PostgreSQL — no en el cliente.
+- **Motor de Puntuación Automatizado**: Trigger `on_match_finished` en BD calcula puntos automáticamente: exacto = 3 pts, resultado correcto (ganador/empate con goles diferentes) = 1 pt, incorrecto = 0 pts.
+- **Ligas Privadas**: Acceso gestionado por tabla relacional `league_members`. Requiere `invite_code` de 6 caracteres.
+- **Realtime**: `useRealtimeLeagueStandings` y `useLeagueChat` usan Supabase Realtime (Postgres Changes + Broadcast) para sincronización sin polling.
+- **Estadísticas Avanzadas**: RPCs en PostgreSQL (`get_league_stats`) calculan premios (Rey del Exacto, Mejor Racha, etc.) usando Window Functions en servidor.

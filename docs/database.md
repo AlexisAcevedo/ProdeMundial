@@ -1,22 +1,27 @@
 # Base de Datos y Reglas de Negocio
 
-La seguridad y la integridad transaccional de ProdeMundial residen 100% en su base de datos **PostgreSQL**, hosteada en Supabase. El cliente frontend React simplemente consume los datos expuestos que la base de datos permite.
+La seguridad y la integridad transaccional de ProdeMundial residen 100% en su base de datos **PostgreSQL**, hosteada en Supabase. El cliente frontend React simplemente consume los datos que la base de datos permite según las políticas configuradas.
 
 ## 1. Esquema Relacional Principal
 
-- **`users`**: Es un espejo local vinculado por clave foránea a `auth.users` (la tabla segura de autenticación de Supabase). Guarda el nombre, email y avatar recolectados de Google.
-- **`leagues`**: Competencias privadas a las que los usuarios pueden unirse. Cada una contiene un identificador alfanumérico único (`invite_code`).
-- **`league_members`**: Tabla relacional (*many-to-many*) que define qué usuario pertenece a qué liga.
-- **`matches`**: Contiene la lista central de los partidos reales del torneo. Maneja su propio estado (`pending`, `in_progress`, `finished`) y registra la hora de inicio (`kickoff_time`).
-- **`predictions`**: Registra los pronósticos de marcador exacto realizados por cada usuario.
-- **`league_comments`**: Muro de interactividad social ("Trash Talk"). Registra los mensajes en tiempo real vinculados a una liga.
+| Tabla | Descripción |
+|-------|-------------|
+| `users` | Espejo local vinculado por FK a `auth.users` (Supabase Auth). Guarda nombre, email y avatar de Google. |
+| `leagues` | Competencias privadas con código de invitación alfanumérico único (`invite_code` de 6 caracteres). |
+| `league_members` | Relación *many-to-many* usuario ↔ liga. |
+| `matches` | Partidos reales del torneo con estado (`pending`, `in_progress`, `finished`), hora de inicio (`kickoff_time`), etapa (`stage`) y grupo (`group`). |
+| `predictions` | Pronósticos de marcador exacto (goles local/visitante) por usuario y partido, con campo `points` calculado por trigger. |
+| `league_comments` | Mensajes del muro Trash Talk vinculados a una liga, con soporte de tiempo real. |
+| `standings` | Vista/tabla materializada de posiciones por liga y global. |
 
 ## 2. Row Level Security (RLS)
 
-La regla fundamental de todo Prode es evitar que alguien edite o adivine el resultado **después de que un partido comienza**. Esta regla se impone mediante **Políticas de Seguridad a Nivel de Fila (RLS)** directamente en PostgreSQL.
+La regla fundamental del prode es evitar que alguien edite su pronóstico **después de que un partido comienza**. Esta regla se impone mediante **Políticas de Seguridad a Nivel de Fila (RLS)** directamente en PostgreSQL.
 
 > [!CAUTION]
-> La validación no se hace en React. Incluso si el cliente estuviese comprometido, la base de datos rechazaría cualquier trampa.
+> La validación no se hace en React. Incluso si el cliente estuviese comprometido, la base de datos rechazaría cualquier intento de trampa.
+
+### Política Central: Cutoff de 30 Minutos
 
 ```sql
 CREATE POLICY "Enable insert for users before cutoff" ON predictions
@@ -27,34 +32,59 @@ CREATE POLICY "Enable insert for users before cutoff" ON predictions
   );
 ```
 
-**Explicación**: Solo se permite insertar o actualizar una fila en la tabla `predictions` si el usuario está autenticado (`auth.uid() = user_id`) y si la hora actual (`now()`) es menor a **30 minutos antes** de la hora de inicio (`kickoff_time`).
+**Explicación**: Solo se permite insertar o actualizar una fila en `predictions` si el usuario está autenticado (`auth.uid() = user_id`) y si la hora actual (`now()`) es menor a **30 minutos antes** del `kickoff_time`.
+
+### Otras Políticas Relevantes
+
+- **`predictions` (SELECT)**: Un usuario solo puede leer sus propios pronósticos, excepto los pronósticos de otros usuarios en la misma liga — visibles solo 30 minutos antes del partido (comparador público).
+- **`leagues` (INSERT/UPDATE)**: Solo el creador de la liga puede modificarla.
+- **`league_members` (INSERT)**: Cualquier usuario autenticado puede unirse proveyendo el `invite_code` correcto.
+- **`league_comments` (INSERT)**: Solo los miembros activos de la liga pueden escribir en el Trash Talk.
+- **`matches` (UPDATE)**: Solo roles de administrador (`service_role`) pueden modificar partidos o cargar resultados.
 
 ## 3. Triggers: El Motor de Puntajes
 
-El cálculo de puntajes no recae en la memoria del navegador. En su lugar, un **Trigger** transaccional actualiza silenciosamente a todos los participantes en el momento en el que el administrador define el resultado de un partido.
+El cálculo de puntajes no recae en el navegador. Un **trigger transaccional** actualiza silenciosamente a todos los participantes en el momento en que el administrador define el resultado de un partido.
 
-El trigger `on_match_finished` se dispara cuando la fila de un partido (`matches`) cambia su estado a `finished`. En ese instante, invoca a la función `calculate_prediction_points()`, que aplica las reglas:
+El trigger `on_match_finished` se dispara cuando una fila de `matches` cambia su estado a `finished`. Invoca `calculate_prediction_points()`, que aplica las reglas:
 
-1. **Exacto (3 Puntos)**: El pronóstico coincide al 100% con el marcador final.
-2. **Resultado Correcto (1 Punto)**: El usuario acertó si hubo un empate, ganó el Local o ganó el Visitante, pero no dio con los goles exactos.
-3. **Incorrecto (0 Puntos)**: No acertó el resultado.
+| Resultado | Puntos |
+|-----------|--------|
+| Marcador exacto (goles exactos) | **3 puntos** |
+| Resultado correcto (empate/ganador sin exacto) | **1 punto** |
+| Pronóstico incorrecto | **0 puntos** |
 
-Esta arquitectura transaccional de triggers garantiza coherencia sin importar cuántos miles de usuarios estén participando simultáneamente.
+Esta arquitectura transaccional garantiza coherencia sin importar cuántos usuarios estén participando simultáneamente.
 
 ## 4. Estadísticas y Premios Avanzados (RPCs)
 
-Además de calcular el puntaje base, el sistema utiliza Stored Procedures (RPCs) como `get_league_stats`. Estas funciones aprovechan el motor analítico de PostgreSQL (Window Functions, `STDDEV`, agrupaciones) para calcular métricas complejas en tiempo real, procesando la carga en el servidor para entregar al frontend resultados limpios:
-- **Rey del Exacto**: Mayor cantidad de aciertos exactos.
-- **El Optimista**: Suma de goles totales pronosticados.
-- **Más Consistente**: Menor desviación estándar en el historial de puntos.
-- **Mejor Racha**: Partidos consecutivos (por `kickoff_time`) sumando puntos.
+El sistema usa Stored Procedures (RPCs) como `get_league_stats` para calcular métricas avanzadas en el servidor usando Window Functions y funciones analíticas de PostgreSQL:
 
-## 5. Gestión de Migraciones
+| Premio | Criterio |
+|--------|----------|
+| **Rey del Exacto** | Mayor cantidad de aciertos exactos (3 puntos) |
+| **El Optimista** | Suma más alta de goles totales pronosticados |
+| **Más Consistente** | Menor desviación estándar en el historial de puntos |
+| **Mejor Racha** | Mayor cantidad de partidos consecutivos sumando puntos |
 
-Todas las modificaciones de base de datos, políticas, triggers y funciones RPC se estructuran como scripts SQL dentro del directorio [../supabase/migrations/](../supabase/migrations/).
+Además, `get_global_standings` y `get_league_standings` son RPCs que calculan las tablas de posiciones agregando puntos de todas las predicciones finalizadas.
+
+## 5. Seguridad Adicional (Migración 2026-06-05)
+
+La migración `20260605200000_security_fixes.sql` incorporó mejoras de seguridad adicionales:
+- Endurecimiento de políticas RLS existentes para prevenir edge cases de escalación.
+- Separación explícita de roles para operaciones administrativas.
+- Revisiones recomendadas por el advisor de seguridad de Supabase.
+
+## 6. Gestión de Migraciones
 
 > [!IMPORTANT]
-> **Procedimiento de Despliegue en Producción**:
-> Al utilizar el entorno de trabajo **Antigravity IDE (MCP)**, la ejecución de los scripts `.sql` se automatiza completamente. El agente IA utiliza el MCP de Supabase para aplicar migraciones directamente a la base de datos de producción mediante la API, evitando tener que usar el SQL Editor.
-> 
-> *Nota para despliegues manuales sin MCP*: En caso de no contar con el agente, cada archivo `.sql` en el directorio de migraciones debe ser copiado y ejecutado manualmente a través del **SQL Editor** del Panel de Control de Supabase en orden secuencial.
+> El directorio `supabase/migrations/` contiene **dos tipos de archivos**:
+> - Archivos con **timestamp ISO** (ej: `20260605200000_security_fixes.sql`): son migraciones formales aplicadas secuencialmente por Supabase CLI o MCP.
+> - Archivos **sin timestamp** (ej: `schema.sql`, `get_league_stats.sql`): son scripts de referencia/utilitarios, **no se aplican automáticamente**. Deben ejecutarse manualmente o ya están incorporados en las migraciones timestampeadas.
+
+### Procedimiento de Despliegue
+
+Al utilizar **Antigravity IDE (MCP)**, la ejecución de scripts `.sql` se automatiza completamente mediante el MCP de Supabase.
+
+*Para despliegues manuales sin MCP*: Copiar y ejecutar cada archivo `.sql` timestampeado en orden secuencial desde el **SQL Editor** del Panel de Control de Supabase.
