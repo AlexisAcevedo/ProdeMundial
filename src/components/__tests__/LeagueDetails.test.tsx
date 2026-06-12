@@ -3,11 +3,23 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import React from 'react';
 import { LeagueDetails } from '../LeagueDetails';
 import { ToastProvider } from '../../contexts/ToastContext';
-import type { League } from '../../lib/types';
+import type { League, Match } from '../../lib/types';
 
 // Mocks
 vi.mock('../ShareLeague', () => ({
   ShareLeague: () => <div data-testid="share-league">ShareLeague Mock</div>,
+}));
+
+vi.mock('../LeagueChat', () => ({
+  LeagueChat: () => <div data-testid="league-chat">LeagueChat Mock</div>,
+}));
+
+vi.mock('../LeagueStats', () => ({
+  LeagueStats: () => <div data-testid="league-stats">LeagueStats Mock</div>,
+}));
+
+vi.mock('../MatchPredictionsModal', () => ({
+  MatchPredictionsModal: () => <div data-testid="match-predictions-modal">MatchPredictionsModal Mock</div>,
 }));
 
 const mockRemoveMember = vi.fn().mockResolvedValue(null);
@@ -23,8 +35,8 @@ vi.mock('../../hooks/useLeagueAdmin', () => ({
 }));
 
 const mockStandings = [
-  { user_id: 'user-admin', email: 'admin@test.com', name: 'Admin User', avatar_url: null, total_points: 10 },
-  { user_id: 'user-member', email: 'member@test.com', name: 'Member User', avatar_url: null, total_points: 5 },
+  { user_id: 'user-admin', display_name: 'Admin User', avatar_url: null, total_points: 10 },
+  { user_id: 'user-member', display_name: 'Member User', avatar_url: null, total_points: 5 },
 ];
 
 vi.mock('../../hooks/useLeagueStandings', () => ({
@@ -50,6 +62,21 @@ describe('LeagueDetails Component', () => {
     owner_id: 'user-admin', // owner es el usuario actual
   };
 
+  const dummyMatches: Match[] = [
+    {
+      id: 'match-1',
+      match_number: 1,
+      kickoff_time: new Date().toISOString(),
+      status: 'pending',
+      home_team: 'Argentina',
+      away_team: 'Brasil',
+      home_score: null,
+      away_score: null,
+      group_letter: 'A',
+      stage: 'Group Stage'
+    }
+  ];
+
   const mockOnBack = vi.fn();
 
   beforeEach(() => {
@@ -62,7 +89,7 @@ describe('LeagueDetails Component', () => {
   test('renders members leaderboard and details', () => {
     render(
       <ToastProvider>
-        <LeagueDetails league={dummyLeague} onBack={mockOnBack} />
+        <LeagueDetails league={dummyLeague} matches={dummyMatches} onBack={mockOnBack} />
       </ToastProvider>
     );
 
@@ -75,7 +102,7 @@ describe('LeagueDetails Component', () => {
   test('renders administrative controls (danger zone, kick buttons) when user is the owner', () => {
     render(
       <ToastProvider>
-        <LeagueDetails league={dummyLeague} onBack={mockOnBack} />
+        <LeagueDetails league={dummyLeague} matches={dummyMatches} onBack={mockOnBack} />
       </ToastProvider>
     );
 
@@ -97,7 +124,7 @@ describe('LeagueDetails Component', () => {
 
     render(
       <ToastProvider>
-        <LeagueDetails league={dummyLeague} onBack={mockOnBack} />
+        <LeagueDetails league={dummyLeague} matches={dummyMatches} onBack={mockOnBack} />
       </ToastProvider>
     );
 
@@ -113,7 +140,7 @@ describe('LeagueDetails Component', () => {
   test('calls removeMember when clicking kick button', async () => {
     render(
       <ToastProvider>
-        <LeagueDetails league={dummyLeague} onBack={mockOnBack} />
+        <LeagueDetails league={dummyLeague} matches={dummyMatches} onBack={mockOnBack} />
       </ToastProvider>
     );
 
@@ -130,7 +157,7 @@ describe('LeagueDetails Component', () => {
   test('calls deleteLeague and triggers onBack when clicking delete button', async () => {
     render(
       <ToastProvider>
-        <LeagueDetails league={dummyLeague} onBack={mockOnBack} />
+        <LeagueDetails league={dummyLeague} matches={dummyMatches} onBack={mockOnBack} />
       </ToastProvider>
     );
 
@@ -145,3 +172,4 @@ describe('LeagueDetails Component', () => {
     expect(mockOnBack).toHaveBeenCalled();
   });
 });
+
