@@ -23,3 +23,4 @@
 - **Ligas Privadas**: Acceso gestionado por tabla relacional `league_members`. Requiere `invite_code` de 6 caracteres.
 - **Realtime**: `useRealtimeLeagueStandings` y `useLeagueChat` usan Supabase Realtime (Postgres Changes + Broadcast) para sincronización sin polling.
 - **Estadísticas Avanzadas**: RPCs en PostgreSQL (`get_league_stats`) calculan premios (Rey del Exacto, Mejor Racha, etc.) usando Window Functions en servidor.
+- **Sincronización Automática**: Edge Function `sync-football-data` obtiene resultados en vivo desde Zafronix API usando ETags (Conditional GETs) guardados en `api_sync_state` para evitar agotar rate limits.

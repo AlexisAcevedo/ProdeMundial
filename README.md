@@ -69,11 +69,16 @@ graph TD
     SBDB -->|Triggers SQL| ScoreEngine[Motor de Puntos Automático]
     SBDB -->|Postgres Changes| Realtime[Supabase Realtime]
     Realtime -->|WebSocket| Hooks
+    
+    Cron[Supabase Cron] -->|Invoca| EdgeFn[Edge Function: sync-football-data]
+    EdgeFn -->|Fetch con ETag| Zafronix[Zafronix API]
+    EdgeFn -->|Actualiza Resultados| SBDB
 ```
 
 ### Stack Tecnológico
 *   **Frontend**: React 19, TypeScript ~6.0, Vite 8, Tailwind CSS v4.
-*   **Backend**: Supabase (PostgreSQL, Auth, RLS, Triggers, RPC, Realtime).
+*   **Backend**: Supabase (PostgreSQL, Auth, RLS, Triggers, RPC, Realtime, Edge Functions).
+*   **Integraciones**: Zafronix API (Resultados, Standings, Live Scores).
 *   **Testing**: Vitest 4, Testing Library, JSDom (unit/integration) + Playwright (E2E).
 
 ---

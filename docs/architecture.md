@@ -25,7 +25,18 @@ graph TD
     SBDB -->|Triggers SQL| Score[Motor de Puntaje Automatizado]
     SBDB -->|Postgres Changes| SBRealtime
     SBRealtime -->|useRealtimeLeagueStandings| Hooks
+    
+    Cron[Supabase Cron] -->|Invoca| EdgeFn[Edge Function: sync-football-data]
+    EdgeFn -->|Fetch con ETag| Zafronix[Zafronix API]
+    EdgeFn -->|Actualiza Resultados| SBDB
 ```
+
+## Sincronización de Datos (Edge Functions)
+
+El torneo mundial es administrado mediante una Supabase Edge Function (`sync-football-data`) que corre periódicamente vía Cron:
+- **Proveedor de Datos**: Consumimos la **Zafronix API** (especializada en el formato de 48 equipos y 12 grupos de 2026).
+- **Eficiencia y Rate Limits**: Utilizamos llamadas condicionales (`If-None-Match`) guardando el último `ETag` en la tabla `api_sync_state`. Si los datos no cambiaron, la API responde HTTP 304, permitiéndonos realizar consultas frecuentes sin consumir la cuota de peticiones gratuitas.
+- **Flujo**: La Edge Function consulta los partidos y las tablas de posiciones (standings), y actualiza las tablas `matches` y `group_standings` en PostgreSQL. Los triggers automáticos se encargan del resto (recalcular puntos).
 
 ## Estructura del Frontend
 
