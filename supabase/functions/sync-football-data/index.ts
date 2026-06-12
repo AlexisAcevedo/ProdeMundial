@@ -22,6 +22,7 @@ interface ZafronixMatch {
   homeScore: number | null
   awayScore: number | null
   result: string | null
+  status?: string
 }
 
 interface ZafronixTeamStanding {
@@ -115,11 +116,17 @@ serve(async (_req) => {
         const apiMatch = apiByNumber.get(dbMatch.match_number)
         if (!apiMatch) continue
 
-        // En Zafronix, si hay score es que terminó el partido (simplificación por ahora, o lo marcamos in_progress si usamos /matches/live luego)
-        // Para este script cron, si homeScore != null, lo damos por finished.
+        // Usamos el status de Zafronix si existe (live, finished, scheduled)
         let newStatus = dbMatch.status
-        if (apiMatch.homeScore !== null && apiMatch.awayScore !== null) {
-          newStatus = 'finished'
+        if (apiMatch.status) {
+          if (apiMatch.status === 'finished') newStatus = 'finished'
+          else if (apiMatch.status === 'live' || apiMatch.status === 'in_play') newStatus = 'in_progress'
+          else if (apiMatch.status === 'scheduled') newStatus = 'pending'
+        } else {
+          // Fallback legacy por si el status no viene
+          if (apiMatch.homeScore !== null && apiMatch.awayScore !== null) {
+            newStatus = 'finished'
+          }
         }
 
         const updatePayload: Record<string, unknown> = {}

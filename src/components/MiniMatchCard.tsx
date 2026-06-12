@@ -22,10 +22,11 @@ export function MiniMatchCard({ match, prediction, onSubmit }: { match: Match, p
   }, []);
 
   const isFinished = match.status === 'finished';
+  const isInProgress = match.status === 'in_progress';
   const kickoffTime = new Date(match.kickoff_time).getTime();
   const cutoffTime = kickoffTime - 30 * 60 * 1000;
   const isPastCutoff = now >= cutoffTime;
-  const canPredict = !isFinished && !isPastCutoff;
+  const canPredict = !isFinished && !isInProgress && !isPastCutoff;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +54,11 @@ export function MiniMatchCard({ match, prediction, onSubmit }: { match: Match, p
           {dateFormatter.format(new Date(match.kickoff_time))}
         </span>
         <div className="scale-75 origin-right sm:origin-center mt-1">
-          {isFinished ? (
+          {isInProgress ? (
+            <span className="animate-pulse rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+              En Juego
+            </span>
+          ) : isFinished ? (
             <span className="rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border border-slate-200 dark:border-white/5">
               Finalizado
             </span>
@@ -71,11 +76,11 @@ export function MiniMatchCard({ match, prediction, onSubmit }: { match: Match, p
           <TeamFlag teamName={match.home_team} />
         </div>
         
-        {isFinished ? (
+        {isFinished || isInProgress ? (
           <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
-            <span className="text-lg font-black text-slate-800 dark:text-white">{match.home_score}</span>
+            <span className="text-lg font-black text-slate-800 dark:text-white">{match.home_score ?? '-'}</span>
             <span className="text-slate-400">-</span>
-            <span className="text-lg font-black text-slate-800 dark:text-white">{match.away_score}</span>
+            <span className="text-lg font-black text-slate-800 dark:text-white">{match.away_score ?? '-'}</span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex items-center gap-1">

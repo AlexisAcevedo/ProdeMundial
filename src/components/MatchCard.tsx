@@ -37,12 +37,13 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
   }, []);
 
   const isFinished = match.status === 'finished';
+  const isInProgress = match.status === 'in_progress';
   
   // Cutoff is 30 minutes before kickoff
   const kickoffTime = new Date(match.kickoff_time).getTime();
   const cutoffTime = kickoffTime - 30 * 60 * 1000;
   const isPastCutoff = now >= cutoffTime;
-  const canPredict = !isFinished && !isPastCutoff;
+  const canPredict = !isFinished && !isInProgress && !isPastCutoff;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,14 +76,18 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
         </div>
       )}
       {/* Decorative gradient orb for active/hover state */}
-      {!isFinished && <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>}
+      {!isFinished && !isInProgress && <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>}
       
       <div className="mb-5 flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
         <span className="flex items-center gap-1.5">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           {dateFormatter.format(new Date(match.kickoff_time))}
         </span>
-        {isFinished ? (
+        {isInProgress ? (
+          <span className="animate-pulse rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            En Juego
+          </span>
+        ) : isFinished ? (
           <span className="rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border border-slate-200 dark:border-white/5">
             Finalizado
           </span>
@@ -103,11 +108,13 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
         </div>
       </div>
 
-      {isFinished ? (
+      {isFinished || isInProgress ? (
         <div className="mt-auto rounded-xl bg-slate-50 p-4 text-center dark:bg-white/5 border border-slate-100 dark:border-white/5">
-          <p className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Resultado Final</p>
+          <p className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            {isInProgress ? 'Resultado Parcial' : 'Resultado Final'}
+          </p>
           <p className="text-3xl font-black text-slate-800 dark:text-white">
-            {match.home_score} <span className="text-brand-500">-</span> {match.away_score}
+            {match.home_score ?? '-'} <span className="text-brand-500">-</span> {match.away_score ?? '-'}
           </p>
           {prediction && (
             <div className="mt-4 border-t border-slate-200/50 pt-4 dark:border-white/5 flex flex-col gap-1">
@@ -154,7 +161,7 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
               {isSubmitting ? 'Guardando...' : (prediction ? 'Actualizar Pronóstico' : 'Guardar Pronóstico')}
             </button>
           )}
-          {isPastCutoff && !isFinished && (
+          {isPastCutoff && !isFinished && !isInProgress && (
             <div className="rounded-xl bg-slate-100 dark:bg-white/5 py-3 text-center border border-slate-200 dark:border-white/5">
               <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
                 🔒 Pronósticos cerrados
@@ -164,7 +171,7 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
         </form>
       )}
 
-      {(isPastCutoff || isFinished) && (
+      {(isPastCutoff || isFinished || isInProgress) && (
         <div className="mt-4 border-t border-slate-100 pt-3 dark:border-white/5 flex flex-col z-10 relative">
           <button
             type="button"
@@ -180,7 +187,7 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
           {showOthers && (
             <MatchPredictionsList
               matchId={match.id}
-              isPastCutoff={isPastCutoff || isFinished}
+              isPastCutoff={isPastCutoff || isFinished || isInProgress}
               isFinished={isFinished}
             />
           )}
