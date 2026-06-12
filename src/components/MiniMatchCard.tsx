@@ -78,9 +78,13 @@ export function MiniMatchCard({ match, prediction, onSubmit }: { match: Match, p
         
         {isFinished || isInProgress ? (
           <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
-            <span className="text-lg font-black text-slate-800 dark:text-white">{match.home_score ?? '-'}</span>
-            <span className="text-slate-400">-</span>
-            <span className="text-lg font-black text-slate-800 dark:text-white">{match.away_score ?? '-'}</span>
+            <span className="text-lg font-black text-slate-800 dark:text-white">
+              {isInProgress ? '-' : (match.home_score ?? '-')}
+            </span>
+            <span className="text-xs font-bold text-slate-400">-</span>
+            <span className="text-lg font-black text-slate-800 dark:text-white">
+              {isInProgress ? '-' : (match.away_score ?? '-')}
+            </span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex items-center gap-1">

@@ -114,7 +114,7 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
             {isInProgress ? 'Resultado Parcial' : 'Resultado Final'}
           </p>
           <p className="text-3xl font-black text-slate-800 dark:text-white">
-            {match.home_score ?? '-'} <span className="text-brand-500">-</span> {match.away_score ?? '-'}
+            {isInProgress ? '-' : (match.home_score ?? '-')} <span className="text-brand-500">-</span> {isInProgress ? '-' : (match.away_score ?? '-')}
           </p>
           {prediction && (
             <div className="mt-4 border-t border-slate-200/50 pt-4 dark:border-white/5 flex flex-col gap-1">
