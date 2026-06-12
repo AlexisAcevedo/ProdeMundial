@@ -36,6 +36,7 @@ export function useLongTermPredictions() {
         const { data: matchData, error: matchError } = await supabase
           .from('matches')
           .select('kickoff_time')
+          .eq('stage', 'Round of 32')
           .order('kickoff_time', { ascending: true })
           .limit(1)
           .single();

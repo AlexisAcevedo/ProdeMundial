@@ -77,14 +77,14 @@ export function LongTermPredictions() {
   );
 
   return (
-    <div className="bg-white dark:bg-fifa-card rounded-3xl p-6 border border-slate-200/50 dark:border-white/5 shadow-sm mb-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+    <div className="bg-white dark:bg-fifa-card rounded-2xl p-4 sm:p-5 border border-slate-200/50 dark:border-white/5 shadow-sm">
+      <div className="flex flex-col mb-4 gap-2">
         <div>
           <h2 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">
             🔮 Predicciones del Torneo
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Pronosticá al Campeón (12 pts) y Subcampeón (6 pts).
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Pronosticá al Campeón y Subcampeón.
           </p>
         </div>
         {isLocked && (
@@ -97,9 +97,9 @@ export function LongTermPredictions() {
         )}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4">
-        {renderTeamSelector('Campeón (12 pts)', champion, setChampion, isLocked || (!isEditing && !!prediction), 'Seleccionar Campeón', true)}
-        {renderTeamSelector('Subcampeón (6 pts)', runnerUp, setRunnerUp, isLocked || (!isEditing && !!prediction), 'Seleccionar Subcampeón', false)}
+      <div className="flex flex-col gap-4">
+        {renderTeamSelector('Campeón', champion, setChampion, isLocked || (!isEditing && !!prediction), 'Elegir...', true)}
+        {renderTeamSelector('Subcampeón', runnerUp, setRunnerUp, isLocked || (!isEditing && !!prediction), 'Elegir...', false)}
       </div>
 
       {!isLocked && (

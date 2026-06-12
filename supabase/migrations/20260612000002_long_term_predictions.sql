@@ -27,27 +27,22 @@ ALTER TABLE long_term_predictions ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de RLS
 -- Permitir lectura a todos (para poder comparar una vez que cierre)
+-- Permitir lectura a todos (para poder comparar una vez que cierre)
 CREATE POLICY "Enable read access for all users on long term predictions" ON long_term_predictions
   FOR SELECT USING (true);
 
--- Permitir insert/update solo si el torneo no empezó.
--- El Mundial 2026 empieza el 11 de Junio de 2026 a las 12:00 PM EST (ejemplo).
--- Podemos usar una fecha dura, o buscar el kickoff del partido 1.
--- Vamos a buscar dinámicamente el primer partido:
-CREATE POLICY "Enable insert for users before tournament starts" ON long_term_predictions
-  FOR INSERT
-  WITH CHECK (
+CREATE POLICY "Users can insert their own predictions before tournament starts" ON long_term_predictions
+  FOR INSERT WITH CHECK (
     auth.uid() = user_id AND
-    now() < (SELECT min(kickoff_time) FROM matches)
+    now() < (SELECT MIN(kickoff_time) FROM matches WHERE stage = 'Round of 32')
   );
 
-CREATE POLICY "Enable update for users before tournament starts" ON long_term_predictions
-  FOR UPDATE
-  USING (
+CREATE POLICY "Users can update their own predictions before tournament starts" ON long_term_predictions
+  FOR UPDATE USING (
     auth.uid() = user_id AND
-    now() < (SELECT min(kickoff_time) FROM matches)
+    now() < (SELECT MIN(kickoff_time) FROM matches WHERE stage = 'Round of 32')
   )
   WITH CHECK (
     auth.uid() = user_id AND
-    now() < (SELECT min(kickoff_time) FROM matches)
+    now() < (SELECT MIN(kickoff_time) FROM matches WHERE stage = 'Round of 32')
   );
