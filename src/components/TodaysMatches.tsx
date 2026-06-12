@@ -1,5 +1,5 @@
 import type { Match, Prediction } from '../lib/types';
-import { MatchCard } from './MatchCard';
+import { MiniMatchCard } from './MiniMatchCard';
 
 interface TodaysMatchesProps {
   matches: Match[];
@@ -30,11 +30,11 @@ export function TodaysMatches({ matches, predictions, onSubmit }: TodaysMatchesP
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-3">
           {todaysMatches.map((match) => {
             const prediction = predictions.find((p) => p.match_id === match.id);
             return (
-              <MatchCard
+              <MiniMatchCard
                 key={match.id}
                 match={match}
                 prediction={prediction}
