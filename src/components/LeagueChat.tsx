@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLeagueChat } from '../hooks/useLeagueChat';
 import { useAuth } from '../hooks/useAuth';
+import { useCommentReactions } from '../hooks/useCommentReactions';
 
 interface LeagueChatProps {
   leagueId: string;
@@ -9,9 +10,23 @@ interface LeagueChatProps {
 export function LeagueChat({ leagueId }: LeagueChatProps) {
   const { messages, isLoading, error, sendMessage } = useLeagueChat(leagueId);
   const { user } = useAuth();
+  const { toggleReaction } = useCommentReactions();
   const [content, setContent] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const AVAILABLE_EMOJIS = ['😂', '🔥', '😱', '👏', '👎', '👀'];
+
+  const parseMentions = (text: string) => {
+    const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('@')) {
+        return <span key={i} className="text-brand-600 dark:text-brand-400 font-bold bg-brand-50 dark:bg-brand-500/10 px-1 rounded-md">{part}</span>;
+      }
+      return part;
+    });
+  };
 
   const scrollToBottom = () => {
     if (scrollContainerRef.current) {
@@ -98,9 +113,62 @@ export function LeagueChat({ leagueId }: LeagueChatProps) {
                       {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <div className={`mt-1 px-3.5 py-2 rounded-2xl text-sm leading-relaxed shadow-sm border ${isMe ? 'bg-brand-600 text-white border-brand-700 rounded-tr-none' : 'bg-slate-100 dark:bg-white/5 text-slate-800 dark:text-slate-200 border-slate-200/50 dark:border-white/5 rounded-tl-none'}`}>
-                    {msg.content}
+                  <div className="relative group">
+                    <div className={`mt-1 px-3.5 py-2 rounded-2xl text-sm leading-relaxed shadow-sm border ${isMe ? 'bg-brand-600 text-white border-brand-700 rounded-tr-none' : 'bg-slate-100 dark:bg-white/5 text-slate-800 dark:text-slate-200 border-slate-200/50 dark:border-white/5 rounded-tl-none'}`}>
+                      {parseMentions(msg.content)}
+                    </div>
+                    
+                    {/* Botón para reaccionar */}
+                    <button 
+                      onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
+                      className={`absolute ${isMe ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 transition-all`}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+
+                    {/* Selector de Emojis */}
+                    {showEmojiPicker === msg.id && (
+                      <div className={`absolute ${isMe ? 'right-0 top-full mt-1' : 'left-0 top-full mt-1'} bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 shadow-xl rounded-xl p-2 flex gap-1 z-20`}>
+                        {AVAILABLE_EMOJIS.map(emoji => (
+                          <button
+                            key={emoji}
+                            onClick={() => {
+                              toggleReaction(msg.id, emoji, false);
+                              setShowEmojiPicker(null);
+                            }}
+                            className="hover:bg-slate-100 dark:hover:bg-white/5 w-8 h-8 flex items-center justify-center rounded-lg transition-colors text-lg"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
+
+                  {/* Renderizar reacciones */}
+                  {msg.reactions && msg.reactions.length > 0 && (
+                    <div className={`flex flex-wrap gap-1 mt-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                      {msg.reactions.map((r: any) => {
+                        const hasReacted = user && r.users.includes(user.id);
+                        return (
+                          <button
+                            key={r.emoji}
+                            onClick={() => toggleReaction(msg.id, r.emoji, !!hasReacted)}
+                            className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full border transition-colors ${
+                              hasReacted 
+                                ? 'bg-brand-50 border-brand-200 text-brand-700 dark:bg-brand-500/20 dark:border-brand-500/30 dark:text-brand-300' 
+                                : 'bg-slate-50 border-slate-200 text-slate-600 dark:bg-white/5 dark:border-white/10 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10'
+                            }`}
+                          >
+                            <span>{r.emoji}</span>
+                            <span>{r.count}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             );

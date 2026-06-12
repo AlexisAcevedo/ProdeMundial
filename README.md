@@ -10,16 +10,17 @@ Plataforma moderna y reactiva de pronósticos deportivos diseñada para competir
 *   **Gestión de Ligas Privadas**:
     *   Creación con generación automática de código de invitación único (6 caracteres).
     *   Tablas de clasificación en tiempo real (Realtime WebSocket).
-    *   Muro interactivo de conversación (Trash Talk) en tiempo real.
+    *   Muro interactivo de conversación (Trash Talk) en tiempo real con reacciones (emojis) y menciones (@usuario).
     *   Premios y estadísticas automáticas: Rey del Exacto, Mejor Racha, El Optimista, Más Consistente.
     *   Comparador público de pronósticos entre participantes (visible 30 minutos antes del partido).
     *   Compartir acceso rápidamente con código de invitación.
 *   **Pronósticos de Partidos**:
     *   Carga masiva y edición individual de marcadores para fase de grupos y eliminatorias.
+    *   Predicciones a largo plazo (Campeón y Subcampeón) con bonificación de puntos al final del torneo.
     *   Historial de predicciones completo.
-    *   Bloqueo automático 30 minutos antes del partido, validado por base de datos (RLS).
+    *   Bloqueo automático 30 minutos antes del partido y al inicio del torneo, validado por base de datos (RLS).
     *   Indicadores visuales de predicciones pendientes.
-    *   Cuenta regresiva hasta el cierre de predicciones.
+    *   Notificaciones Push (PWA) para alertar sobre partidos inminentes sin predicción.
 *   **Fase de Eliminatorias (Tournament Bracket)**:
     *   Cuadro interactivo adaptado a desktop y mobile.
     *   Filtros dinámicos por grupos y pestañas por etapa del torneo.

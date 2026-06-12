@@ -8,6 +8,11 @@ export interface ChatMessage {
   user_id: string;
   content: string;
   created_at: string;
+  reactions?: Array<{
+    emoji: string;
+    count: number;
+    users: string[];
+  }>;
   user: {
     display_name: string;
     avatar_url: string | null;
@@ -31,37 +36,22 @@ export function useLeagueChat(leagueId: string | null) {
       setIsLoading(true);
       setError(null);
       try {
-        const { data, error } = await supabase
-          .from('league_comments')
-          .select(`
-            id,
-            league_id,
-            user_id,
-            content,
-            created_at,
-            user:users (
-              name,
-              email,
-              avatar_url
-            )
-          `)
-          .eq('league_id', leagueId)
-          .order('created_at', { ascending: true });
+        const { data, error } = await supabase.rpc('get_league_comments', { p_league_id: leagueId });
 
         if (error) throw error;
         
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const formatted = (data || []).map((msg: any) => {
-          const u = Array.isArray(msg.user) ? msg.user[0] : msg.user;
+        const formatted = (data || []).reverse().map((msg: any) => {
           return {
             id: msg.id,
             league_id: msg.league_id,
             user_id: msg.user_id,
             content: msg.content,
             created_at: msg.created_at,
+            reactions: msg.reactions || [],
             user: {
-              display_name: u?.name || (u?.email ? u.email.split('@')[0].substring(0, 5) : 'Participante'),
-              avatar_url: u?.avatar_url || null
+              display_name: msg.display_name,
+              avatar_url: msg.avatar_url
             },
           };
         });
@@ -82,35 +72,21 @@ export function useLeagueChat(leagueId: string | null) {
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'league_comments',
           filter: `league_id=eq.${leagueId}`,
         },
-        async (payload) => {
-          const newComment = payload.new;
-          
-          // Buscar los datos de perfil del usuario que escribió el comentario
-          const { data: userData } = await supabase
-            .from('users')
-            .select('name, email, avatar_url')
-            .eq('id', newComment.user_id)
-            .single();
-
-          const messageWithUser: ChatMessage = {
-            id: newComment.id,
-            league_id: newComment.league_id,
-            user_id: newComment.user_id,
-            content: newComment.content,
-            created_at: newComment.created_at,
-            user: {
-              display_name: userData?.name || (userData?.email ? userData.email.split('@')[0].substring(0, 5) : 'Participante'),
-              avatar_url: userData?.avatar_url || null
-            },
-          };
-
-          setMessages((prev) => [...prev, messageWithUser]);
-        }
+        () => fetchMessages() // Refetch en lugar de push para traer las reacciones y demás
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'league_comment_reactions',
+        },
+        () => fetchMessages() // Refetch cuando alguien reacciona
       )
       .subscribe();
 

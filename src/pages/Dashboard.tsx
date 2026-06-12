@@ -6,6 +6,7 @@ import { useLeagues } from '../hooks/useLeagues';
 import { useTheme } from '../hooks/useTheme';
 import { MatchTabs } from '../components/MatchTabs';
 import { TodaysMatches } from '../components/TodaysMatches';
+import { LongTermPredictions } from '../components/LongTermPredictions';
 import { LeagueDetails } from '../components/LeagueDetails';
 import type { League } from '../lib/types';
 import { usePendingPredictions } from '../hooks/usePendingPredictions';
@@ -207,6 +208,10 @@ export function Dashboard() {
               </div>
             )}
 
+            {/* Predicciones a Largo Plazo */}
+            <LongTermPredictions />
+
+            {/* Partidos de Hoy Widget */}
             <TodaysMatches matches={matches} predictions={predictions} onSubmit={submitPrediction} />
 
             <MatchTabs
