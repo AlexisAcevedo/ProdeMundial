@@ -1,46 +1,46 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const API_KEY = Deno.env.get('FOOTBALL_DATA_TOKEN')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-// ─── Tipos de la API ──────────────────────────────────────────────────────────
+// ─── Tipos de la API (TheSportsDB) ──────────────────────────────────────────────
 
-interface ApiTeam {
-  id: number
-  name: string
-  shortName: string
+interface TSDBEvent {
+  idEvent: string
+  strEvent: string
+  strHomeTeam: string
+  strAwayTeam: string
+  intHomeScore: string | null
+  intAwayScore: string | null
+  strTimestamp: string // formato: "2026-06-11T19:00:00"
+  strStatus: string    // e.g. "FT", "NS", "LIVE", "HT"
+  intRound: string
 }
 
-interface ApiMatch {
-  id: number
-  utcDate: string
-  status: string // SCHEDULED | IN_PLAY | PAUSED | FINISHED | SUSPENDED | POSTPONED | CANCELLED | AWARDED
-  stage: string
-  group: string | null
-  homeTeam: ApiTeam
-  awayTeam: ApiTeam
-  score: {
-    winner: string | null
-    duration: string
-    fullTime: { home: number | null; away: number | null }
-    halfTime: { home: number | null; away: number | null }
-  }
+interface TSDBStanding {
+  strTeam: string
+  strGroup: string // e.g. "Group Stage - Group A"
+  intRank: string
+  intPlayed: string
+  intWin: string
+  intLoss: string
+  intDraw: string
+  intGoalsFor: string
+  intGoalsAgainst: string
+  intGoalDifference: string
+  intPoints: string
 }
 
 // ─── Mapeo de nombres API → nombres en nuestra DB ─────────────────────────────
-// La API puede usar nombres ligeramente distintos a los que seteamos en el seed.
-// Agregamos aquí cualquier discrepancia que aparezca.
+// TheSportsDB usa algunos nombres diferentes a nuestra base de datos.
 const API_NAME_MAP: Record<string, string> = {
-  "IR Iran": "IR Iran",
-  "Côte d'Ivoire": "Côte d'Ivoire",
-  "Bosnia and Herzegovina": "Bosnia and Herzegovina",
-  "DR Congo": "DR Congo",
-  "Cabo Verde": "Cabo Verde",
-  "Curaçao": "Curaçao",
-  "United States": "USA",
-  "Korea Republic": "South Korea",
+  "Bosnia-Herzegovina": "Bosnia and Herzegovina",
+  "Cape Verde": "Cabo Verde",
+  "Czech Republic": "Czechia",
+  "Ivory Coast": "Côte d'Ivoire",
+  "Iran": "IR Iran",
+  "United States": "USA"
 }
 
 function normalizeTeamName(apiName: string): string {
@@ -49,8 +49,9 @@ function normalizeTeamName(apiName: string): string {
 
 // ─── Status de la API → nuestro status ───────────────────────────────────────
 function normalizeStatus(apiStatus: string): 'pending' | 'in_progress' | 'finished' {
-  if (apiStatus === 'FINISHED' || apiStatus === 'AWARDED') return 'finished'
-  if (apiStatus === 'IN_PLAY' || apiStatus === 'PAUSED' || apiStatus === 'SUSPENDED') return 'in_progress'
+  const status = apiStatus ? apiStatus.toUpperCase() : ''
+  if (['FT', 'AET', 'PEN'].includes(status)) return 'finished'
+  if (['LIVE', 'HT'].includes(status)) return 'in_progress'
   return 'pending'
 }
 
@@ -71,37 +72,44 @@ serve(async (_req) => {
   const log: string[] = []
 
   try {
-    if (!API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error("Faltan variables de entorno.")
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error("Faltan variables de entorno SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY.")
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
     // ══════════════════════════════════════════════════════════════════════════
-    // PASO 1: Traer todos los partidos del torneo desde la API
-    // Usamos un rango amplio para cubrir el torneo completo y no depender
-    // de la fecha actual. El plan free de la API limita a 10 req/min.
+    // PASO 1: Traer todos los partidos del torneo desde TheSportsDB
     // ══════════════════════════════════════════════════════════════════════════
-    log.push("▶ Consultando fixtures del Mundial a la API...")
+    log.push("▶ Consultando fixtures del Mundial a TheSportsDB...")
     const fixturesRes = await fetch(
-      `https://api.football-data.org/v4/competitions/WC/matches`,
-      { headers: { 'X-Auth-Token': API_KEY } }
+      "https://www.thesportsdb.com/api/v1/json/123/eventsseason.php?id=4429&s=2026"
     )
 
     if (!fixturesRes.ok) {
-      throw new Error(`API fixtures error: ${fixturesRes.status} ${await fixturesRes.text()}`)
+      throw new Error(`TheSportsDB fixtures error: ${fixturesRes.status} ${await fixturesRes.text()}`)
     }
 
     const fixturesData = await fixturesRes.json()
-    const apiMatches: ApiMatch[] = fixturesData.matches ?? []
-    log.push(`✓ ${apiMatches.length} partidos recibidos de la API.`)
+    const apiMatches: TSDBEvent[] = fixturesData.events ?? []
+    log.push(`✓ ${apiMatches.length} partidos recibidos de TheSportsDB.`)
 
-    // Construimos un mapa utcDate → ApiMatch para correlacionar con nuestra DB
-    const apiByDate = new Map<string, ApiMatch>()
+    // Mapas para correlacionar los partidos
+    const apiByTeams = new Map<string, TSDBEvent>()
+    const apiByDate = new Map<string, TSDBEvent>()
+
     for (const m of apiMatches) {
-      // Normalizamos a ISO string sin milisegundos para comparar
-      const key = new Date(m.utcDate).toISOString()
-      apiByDate.set(key, m)
+      // 1. Correlación por nombres de equipos normalizados
+      const homeNorm = normalizeTeamName(m.strHomeTeam)
+      const awayNorm = normalizeTeamName(m.strAwayTeam)
+      apiByTeams.set(`${homeNorm}_${awayNorm}`, m)
+
+      // 2. Correlación por fecha (UTC) como fallback
+      if (m.strTimestamp) {
+        const dateStr = m.strTimestamp.endsWith('Z') ? m.strTimestamp : m.strTimestamp + 'Z'
+        const key = new Date(dateStr).toISOString()
+        apiByDate.set(key, m)
+      }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -121,29 +129,52 @@ serve(async (_req) => {
     let updatedResults = 0
 
     for (const dbMatch of (dbMatches ?? [])) {
-      const kickoffKey = new Date(dbMatch.kickoff_time).toISOString()
-      const apiMatch = apiByDate.get(kickoffKey)
+      let apiMatch: TSDBEvent | undefined
+
+      // Buscamos primero por combinación de equipos si no son placeholders
+      if (!isPlaceholder(dbMatch.home_team) && !isPlaceholder(dbMatch.away_team)) {
+        const teamKey = `${normalizeTeamName(dbMatch.home_team)}_${normalizeTeamName(dbMatch.away_team)}`
+        apiMatch = apiByTeams.get(teamKey)
+      }
+
+      // Si no coincide por equipos (o son placeholders), buscamos por fecha
+      if (!apiMatch) {
+        const kickoffKey = new Date(dbMatch.kickoff_time).toISOString()
+        apiMatch = apiByDate.get(kickoffKey)
+      }
 
       if (!apiMatch) continue
 
-      const newStatus = normalizeStatus(apiMatch.status)
+      const newStatus = normalizeStatus(apiMatch.strStatus)
 
       // Solo actualizamos si algo cambió
       if (newStatus === dbMatch.status && newStatus !== 'finished') continue
 
       const updatePayload: Record<string, unknown> = { status: newStatus }
 
-      if (newStatus === 'finished' && apiMatch.score.fullTime.home !== null) {
-        updatePayload.home_score = apiMatch.score.fullTime.home
-        updatePayload.away_score = apiMatch.score.fullTime.away
+      if (newStatus === 'finished') {
+        const homeScore = apiMatch.intHomeScore !== null && apiMatch.intHomeScore !== undefined && apiMatch.intHomeScore !== ""
+          ? parseInt(apiMatch.intHomeScore)
+          : null
+        const awayScore = apiMatch.intAwayScore !== null && apiMatch.intAwayScore !== undefined && apiMatch.intAwayScore !== ""
+          ? parseInt(apiMatch.intAwayScore)
+          : null
+
+        if (homeScore !== null && awayScore !== null) {
+          updatePayload.home_score = homeScore
+          updatePayload.away_score = awayScore
+        }
       }
 
-      // Si el partido tiene equipos reales en la API pero nosotros tenemos placeholder, actualizamos también
-      if (!apiMatch.homeTeam.name.includes('TBD') && isPlaceholder(dbMatch.home_team)) {
-        updatePayload.home_team = normalizeTeamName(apiMatch.homeTeam.name)
+      // Si el partido tiene equipos reales en la API pero nosotros tenemos placeholder, actualizamos
+      const isApiHomePlaceholder = !apiMatch.strHomeTeam || apiMatch.strHomeTeam.toUpperCase().includes('TBD') || isPlaceholder(apiMatch.strHomeTeam)
+      const isApiAwayPlaceholder = !apiMatch.strAwayTeam || apiMatch.strAwayTeam.toUpperCase().includes('TBD') || isPlaceholder(apiMatch.strAwayTeam)
+
+      if (!isApiHomePlaceholder && isPlaceholder(dbMatch.home_team)) {
+        updatePayload.home_team = normalizeTeamName(apiMatch.strHomeTeam)
       }
-      if (!apiMatch.awayTeam.name.includes('TBD') && isPlaceholder(dbMatch.away_team)) {
-        updatePayload.away_team = normalizeTeamName(apiMatch.awayTeam.name)
+      if (!isApiAwayPlaceholder && isPlaceholder(dbMatch.away_team)) {
+        updatePayload.away_team = normalizeTeamName(apiMatch.strAwayTeam)
       }
 
       const { error: updateError } = await supabase
@@ -161,43 +192,41 @@ serve(async (_req) => {
     log.push(`✓ ${updatedResults} partidos actualizados con resultados.`)
 
     // ══════════════════════════════════════════════════════════════════════════
-    // PASO 4: Actualizar tabla de posiciones desde la API
+    // PASO 4: Actualizar tabla de posiciones desde TheSportsDB
     // ══════════════════════════════════════════════════════════════════════════
-    log.push("▶ Consultando standings del Mundial a la API...")
+    log.push("▶ Consultando standings del Mundial a TheSportsDB...")
     const standingsRes = await fetch(
-      `https://api.football-data.org/v4/competitions/WC/standings`,
-      { headers: { 'X-Auth-Token': API_KEY } }
+      "https://www.thesportsdb.com/api/v1/json/123/lookuptable.php?l=4429&s=2026"
     )
 
     if (!standingsRes.ok) {
-      throw new Error(`API standings error: ${standingsRes.status}`)
+      throw new Error(`TheSportsDB standings error: ${standingsRes.status}`)
     }
 
     const standingsData = await standingsRes.json()
+    const apiStandings: TSDBStanding[] = standingsData.table ?? []
     const upsertPayload: Record<string, unknown>[] = []
 
-    for (const groupObj of (standingsData.standings ?? [])) {
-      if (groupObj.type !== "TOTAL" || groupObj.stage !== "GROUP_STAGE") continue
-
-      const groupLetter = groupObj.group ? groupObj.group.replace('GROUP_', '').replace('GROUP ', '') : ''
+    for (const row of apiStandings) {
+      // strGroup tiene formato "Group Stage - Group A". Extraemos la letra.
+      const groupMatch = row.strGroup ? row.strGroup.match(/Group Stage - Group ([A-L])/i) : null
+      const groupLetter = groupMatch ? groupMatch[1].toUpperCase() : ''
       if (!groupLetter) continue
 
-      for (const row of groupObj.table) {
-        upsertPayload.push({
-          team_name: normalizeTeamName(row.team.name),
-          group_letter: groupLetter,
-          points: row.points,
-          played: row.playedGames,
-          won: row.won,
-          drawn: row.draw,
-          lost: row.lost,
-          goals_for: row.goalsFor,
-          goals_against: row.goalsAgainst,
-          goals_diff: row.goalDifference,
-          rank: row.position,
-          updated_at: new Date().toISOString(),
-        })
-      }
+      upsertPayload.push({
+        team_name: normalizeTeamName(row.strTeam),
+        group_letter: groupLetter,
+        points: parseInt(row.intPoints),
+        played: parseInt(row.intPlayed),
+        won: parseInt(row.intWin),
+        drawn: parseInt(row.intDraw),
+        lost: parseInt(row.intLoss),
+        goals_for: parseInt(row.intGoalsFor),
+        goals_against: parseInt(row.intGoalsAgainst),
+        goals_diff: parseInt(row.intGoalDifference),
+        rank: parseInt(row.intRank),
+        updated_at: new Date().toISOString(),
+      })
     }
 
     if (upsertPayload.length > 0) {
@@ -211,11 +240,6 @@ serve(async (_req) => {
 
     // ══════════════════════════════════════════════════════════════════════════
     // PASO 5: Resolver placeholders de 1ro/2do de grupo con standings
-    //
-    // Estrategia: cuando un grupo tiene los 4 equipos con played=3 (terminó),
-    // buscamos en la tabla matches los partidos de Round of 32 que tengan
-    // placeholders como "1A", "2B" referentes a ese grupo y los reemplazamos
-    // con el team_name real del rank correspondiente.
     // ══════════════════════════════════════════════════════════════════════════
     log.push("▶ Resolviendo placeholders de fase final...")
 
@@ -289,9 +313,6 @@ serve(async (_req) => {
           if (!refMatch || refMatch.home_score === null || refMatch.away_score === null) continue
 
           // Determinar ganador y perdedor
-          // En fases de eliminación directa no puede haber empate en tiempo reglamentario,
-          // pero si los scores son iguales (penales), la API ya los ajusta en score.winner.
-          // Aquí confiamos en los scores finales que ya actualizamos en el Paso 3.
           let winner: string | null = null
           let runnerUp: string | null = null
 
@@ -302,8 +323,6 @@ serve(async (_req) => {
             winner = refMatch.away_team
             runnerUp = refMatch.home_team
           }
-          // Si hay empate en score (penales), no podemos resolver localmente sin el campo winner de la API.
-          // En ese caso dejamos el placeholder y lo resolverá el Paso 3 via apiMatch.homeTeam.
 
           if (type === 'W' && winner) {
             updates[side] = winner
@@ -311,9 +330,6 @@ serve(async (_req) => {
             updates[side] = runnerUp
           }
         }
-
-        // Los placeholders tipo "3ABCDF" (mejor tercero) los resuelve la API directamente
-        // en el fixture (Paso 3). No los calculamos aquí.
       }
 
       if (Object.keys(updates).length > 0) {
@@ -323,7 +339,7 @@ serve(async (_req) => {
           .eq('id', match.id)
 
         if (updateError) {
-          log.push(`⚠ Error resolviendo placeholder en match ${match.match_number}: ${updateError.message}`)
+          log.push(`⚠ Error actualizando placeholder en match ${match.match_number}: ${updateError.message}`)
         } else {
           resolvedPlaceholders++
         }
