@@ -105,7 +105,7 @@ export function LeagueStats({ leagueId }: LeagueStatsProps) {
       colorClass: 'text-emerald-600 dark:text-emerald-400',
       iconBgClass: 'bg-emerald-100 dark:bg-emerald-950/20',
       data: consistent,
-      formatValue: (val) => `Desv. std: ${val}`,
+      formatValue: (val) => val === 0 ? 'Sin variación' : `Variación: ${val}`,
     },
   ];
 
