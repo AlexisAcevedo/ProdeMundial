@@ -99,7 +99,6 @@ serve(async (_req) => {
       const { data: dbMatches, error: dbError } = await supabase
         .from('matches')
         .select('id, match_number, status, home_team, away_team')
-        .in('status', ['pending', 'in_progress'])
 
       if (dbError) throw dbError
 
