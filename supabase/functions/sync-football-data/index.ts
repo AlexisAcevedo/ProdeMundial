@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // API Configuration
-const API_KEY = Deno.env.get('FOOTBALL_DATA_TOKEN') // We keep the env var name for compatibility, but it holds Zafronix key
+const API_KEY = Deno.env.get('ZAFRONIX_API_KEY') || 'zwc_free_971b85269e49cc5e6724cedf'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
