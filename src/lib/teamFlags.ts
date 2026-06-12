@@ -41,12 +41,15 @@ export const TEAM_FLAG_MAP: Record<string, string> = {
   'Jordan': 'jo',
   'Portugal': 'pt',
   'DR Congo': 'cd',
+  'Congo DR': 'cd',
   'Uzbekistan': 'uz',
   'Colombia': 'co',
   'England': 'gb-eng',
   'Croatia': 'hr',
   'Ghana': 'gh',
   'Panama': 'pa',
+  'Türkiye': 'tr',
+  'Korea Republic': 'kr',
 };
 
 /**
