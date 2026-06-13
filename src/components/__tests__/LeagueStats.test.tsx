@@ -44,8 +44,9 @@ describe('LeagueStats Component', () => {
 
   test('renders cards with winner data correctly', () => {
     const mockStatsData = [
-      { metric: 'exact_king', user_id: 'u1', user_name: 'Diego Maradona', user_email: 'diego@test.com', user_avatar_url: null, value: 5 },
-      { metric: 'streak', user_id: 'u2', user_name: 'Leo Messi', user_email: 'leo@test.com', user_avatar_url: null, value: 4 },
+      { metric: 'exact_king', user_id: 'u1', user_name: 'Diego Maradona', user_avatar_url: null, value: 5 },
+      { metric: 'streak', user_id: 'u2', user_name: 'Leo Messi', user_avatar_url: null, value: 4 },
+      { metric: 'crap_king', user_id: 'u3', user_name: 'Harry Maguire', user_avatar_url: null, value: 8 },
     ];
 
     mockUseLeagueStats.mockReturnValue({
