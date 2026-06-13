@@ -54,8 +54,8 @@ export function LeagueStats({ leagueId }: LeagueStatsProps) {
   // Buscar cada estadística en la lista
   const exactKing = stats.find((s) => s.metric === 'exact_king');
   const optimist = stats.find((s) => s.metric === 'optimist');
-  const consistent = stats.find((s) => s.metric === 'consistent');
   const streak = stats.find((s) => s.metric === 'streak');
+  const crapKings = stats.filter((s) => s.metric === 'crap_king');
 
   const statCards: {
     id: string;
@@ -65,6 +65,7 @@ export function LeagueStats({ leagueId }: LeagueStatsProps) {
     colorClass: string;
     iconBgClass: string;
     data: LeagueStatItem | undefined;
+    multipleData?: LeagueStatItem[];
     formatValue: (val: number) => string;
   }[] = [
     {
@@ -98,14 +99,15 @@ export function LeagueStats({ leagueId }: LeagueStatsProps) {
       formatValue: (val) => `${val} gol${val !== 1 ? 'es' : ''}`,
     },
     {
-      id: 'consistent',
-      title: 'Más Consistente',
-      description: 'Menor variación en sus puntajes.',
-      icon: '🎯',
-      colorClass: 'text-emerald-600 dark:text-emerald-400',
-      iconBgClass: 'bg-emerald-100 dark:bg-emerald-950/20',
-      data: consistent,
-      formatValue: (val) => val === 0 ? 'Sin variación' : `Variación: ${val}`,
+      id: 'crap_king',
+      title: 'Rey del Crap',
+      description: 'Más pronósticos errados (0 puntos).',
+      icon: '💩',
+      colorClass: 'text-amber-800 dark:text-amber-600',
+      iconBgClass: 'bg-amber-900/10 dark:bg-amber-900/30',
+      data: crapKings.length > 0 ? crapKings[0] : undefined,
+      multipleData: crapKings.length > 0 ? crapKings : undefined,
+      formatValue: (val) => `${val} error${val !== 1 ? 'es' : ''}`,
     },
   ];
 
@@ -144,20 +146,38 @@ export function LeagueStats({ leagueId }: LeagueStatsProps) {
                   </div>
                 </div>
 
-                {/* Ganador actual */}
+                {/* Ganador(es) actual(es) */}
                 <div className="pt-2 border-t border-slate-100 dark:border-white/5">
                   {hasWinner ? (
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                        Líder actual
-                      </span>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 block truncate">
-                        {winnerName}
-                      </span>
-                      <span className={`text-xs font-black block mt-0.5 ${card.colorClass}`}>
-                        {card.formatValue(card.data!.value)}
-                      </span>
-                    </div>
+                    card.multipleData && card.multipleData.length > 1 ? (
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                          Líderes actuales
+                        </span>
+                        {card.multipleData.map((winner, idx) => (
+                          <div key={winner.user_id || idx} className="flex justify-between items-center">
+                            <span className="text-sm font-bold text-slate-700 dark:text-slate-200 block truncate pr-2">
+                              {winner.user_name}
+                            </span>
+                            <span className={`text-xs font-black shrink-0 ${card.colorClass}`}>
+                              {card.formatValue(winner.value)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                          Líder actual
+                        </span>
+                        <span className="text-sm font-bold text-slate-700 dark:text-slate-200 block truncate">
+                          {winnerName}
+                        </span>
+                        <span className={`text-xs font-black block mt-0.5 ${card.colorClass}`}>
+                          {card.formatValue(card.data!.value)}
+                        </span>
+                      </div>
+                    )
                   ) : (
                     <div className="py-2 text-center text-xs text-slate-400 dark:text-slate-500 italic">
                       Sin datos

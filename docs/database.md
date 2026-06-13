@@ -64,7 +64,7 @@ El sistema usa Stored Procedures (RPCs) como `get_league_stats` para calcular m�
 |--------|----------|
 | **Rey del Exacto** | Mayor cantidad de aciertos exactos (3 puntos) |
 | **El Optimista** | Suma más alta de goles totales pronosticados |
-| **Más Consistente** | Menor desviación estándar en el historial de puntos |
+| **Rey del Crap** | Más pronósticos errados (0 puntos) en el historial |
 | **Mejor Racha** | Mayor cantidad de partidos consecutivos sumando puntos |
 
 Además, `get_global_standings` y `get_league_standings` son RPCs que calculan las tablas de posiciones agregando puntos de todas las predicciones finalizadas.

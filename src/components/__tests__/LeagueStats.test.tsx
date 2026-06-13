@@ -60,7 +60,7 @@ describe('LeagueStats Component', () => {
     expect(screen.getByText('Rey del Exacto')).toBeInTheDocument();
     expect(screen.getByText('Mejor Racha')).toBeInTheDocument();
     expect(screen.getByText('El Optimista')).toBeInTheDocument();
-    expect(screen.getByText('Más Consistente')).toBeInTheDocument();
+    expect(screen.getByText('Rey del Crap')).toBeInTheDocument();
 
     // Ganadores
     expect(screen.getByText('Diego Maradona')).toBeInTheDocument();

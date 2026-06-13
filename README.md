@@ -11,7 +11,7 @@ Plataforma moderna y reactiva de pronósticos deportivos diseñada para competir
     *   Creación con generación automática de código de invitación único (6 caracteres).
     *   Tablas de clasificación en tiempo real (Realtime WebSocket).
     *   Muro interactivo de conversación (Trash Talk) en tiempo real con reacciones (emojis) y menciones (@usuario).
-    *   Premios y estadísticas automáticas: Rey del Exacto, Mejor Racha, El Optimista, Más Consistente.
+    *   Premios y estadísticas automáticas: Rey del Exacto, Mejor Racha, El Optimista, Rey del Crap.
     *   Comparador público de pronósticos entre participantes (visible 30 minutos antes del partido).
     *   Compartir acceso rápidamente con código de invitación.
 *   **Pronósticos de Partidos**:
