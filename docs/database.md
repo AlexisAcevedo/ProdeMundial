@@ -88,3 +88,11 @@ La migración `20260605200000_security_fixes.sql` incorporó mejoras de segurida
 Al utilizar **Antigravity IDE (MCP)**, la ejecución de scripts `.sql` se automatiza completamente mediante el MCP de Supabase.
 
 *Para despliegues manuales sin MCP*: Copiar y ejecutar cada archivo `.sql` timestampeado en orden secuencial desde el **SQL Editor** del Panel de Control de Supabase.
+
+## 7. Sincronización Automática de Partidos (API Zafronix)
+
+El estado de los partidos en vivo y los resultados se sincronizan usando una **Edge Function de Supabase (`sync-football-data`)** que lee datos de la API de Zafronix.
+Esta Edge Function se ejecuta periódicamente gracias a la extensión **pg_cron** (`supabase/migrations/20240601000001_cron_sync_job.sql`).
+
+> [!WARNING]
+> La caché (ETag) de la API de Zafronix a veces devuelve falsos positivos (`304 Not Modified`) impidiendo la correcta actualización de los partidos. Por seguridad y fiabilidad, nuestra Edge Function tiene deshabilitada esta comprobación de cabeceras HTTP y siempre consume la respuesta en tiempo real. Esto asegura que el estado `finished` se detecte correctamente, lo cual es crítico para que se disparen los triggers de puntos en la base de datos.
