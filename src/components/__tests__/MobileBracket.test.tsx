@@ -24,6 +24,7 @@ describe('MobileBracket Component', () => {
       away_score: null,
       status: 'pending',
       stage: 'knockout',
+      group_letter: null,
     },
     {
       id: 'm2',
@@ -35,6 +36,7 @@ describe('MobileBracket Component', () => {
       away_score: null,
       status: 'pending',
       stage: 'knockout',
+      group_letter: null,
     },
     {
       id: 'm3',
@@ -46,6 +48,7 @@ describe('MobileBracket Component', () => {
       away_score: null,
       status: 'pending',
       stage: 'knockout',
+      group_letter: null,
     },
   ];
 

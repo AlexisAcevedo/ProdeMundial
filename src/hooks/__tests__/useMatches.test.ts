@@ -41,7 +41,7 @@ describe('useMatches Hook', () => {
   test('listens to postgres_changes and updates state on UPDATE event', async () => {
     let changeCallback: any;
     mockSupabaseInstance.mockChannel.mockReturnValue({
-      on: vi.fn().mockImplementation((event, filter, callback) => {
+      on: vi.fn().mockImplementation((_event, _filter, callback) => {
         changeCallback = callback;
         return { subscribe: vi.fn(), unsubscribe: vi.fn() };
       }),
