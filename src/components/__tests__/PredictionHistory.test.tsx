@@ -1,6 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
 import { PredictionHistory } from '../PredictionHistory';
 import type { Match, Prediction } from '../../lib/types';
 

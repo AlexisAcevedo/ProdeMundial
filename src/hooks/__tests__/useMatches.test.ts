@@ -1,7 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useMatches } from '../useMatches';
-import { createSupabaseMock } from '../../test/mocks/supabase';
 
 vi.mock('../../lib/supabase', () => {
   const mockInstance = (globalThis as any).createSupabaseMock();

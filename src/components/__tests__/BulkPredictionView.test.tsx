@@ -1,6 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import React from 'react';
 import { BulkPredictionView } from '../BulkPredictionView';
 import type { Match, Prediction } from '../../lib/types';
 import { ToastProvider } from '../../contexts/ToastContext';
@@ -62,7 +61,7 @@ describe('BulkPredictionView Component', () => {
       match_id: 'm1',
       home_score: 2,
       away_score: 1,
-      points: null,
+      points: 0,
     },
   ];
 

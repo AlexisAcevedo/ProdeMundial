@@ -1,8 +1,7 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
 import { MobileBracket } from '../MobileBracket';
-import type { Match, Prediction } from '../../lib/types';
+import type { Match } from '../../lib/types';
 
 // Mock BracketMatchCard to isolate MobileBracket testing
 vi.mock('../TournamentBracket', () => ({

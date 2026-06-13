@@ -1,8 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import React from 'react';
 import { ProfileModal } from '../ProfileModal';
-import { createSupabaseMock } from '../../test/mocks/supabase';
 import { ToastProvider } from '../../contexts/ToastContext';
 
 vi.mock('../../lib/supabase', () => {

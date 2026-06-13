@@ -1,8 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
-import React from 'react';
 import { MatchPredictionsList } from '../MatchPredictionsList';
-import { createSupabaseMock } from '../../test/mocks/supabase';
 import { MockAuthProvider } from '../../test/mocks/auth';
 
 vi.mock('../../lib/supabase', () => {

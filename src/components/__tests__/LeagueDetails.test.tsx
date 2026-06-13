@@ -1,6 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import React from 'react';
 import { LeagueDetails } from '../LeagueDetails';
 import { ToastProvider } from '../../contexts/ToastContext';
 import type { League, Match } from '../../lib/types';

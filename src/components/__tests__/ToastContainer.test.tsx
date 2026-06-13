@@ -1,6 +1,5 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import React from 'react';
 import { ToastProvider, useToast } from '../../contexts/ToastContext';
 import { ToastContainer } from '../ToastContainer';
 
