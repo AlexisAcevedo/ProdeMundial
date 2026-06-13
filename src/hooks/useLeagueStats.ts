@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export interface LeagueStatItem {
-  metric: 'exact_king' | 'optimist' | 'consistent' | 'streak';
+  metric: 'exact_king' | 'optimist' | 'crap_king' | 'streak';
   user_id: string;
   user_name: string | null;
   user_avatar_url: string | null;
