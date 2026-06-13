@@ -61,7 +61,7 @@ async function saveEtag(supabase: any, endpoint: string, etag: string) {
     .upsert({ endpoint, etag, last_sync: new Date().toISOString() })
 }
 
-serve(async (_req) => {
+serve(async (_req: Request) => {
   const log: string[] = []
 
   try {
