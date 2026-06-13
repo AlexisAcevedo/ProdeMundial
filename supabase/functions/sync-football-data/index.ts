@@ -138,15 +138,20 @@ serve(async (_req: Request) => {
           shouldUpdate = true
         }
 
-        // Actualizar nombres de equipos si se revelaron (pasan de TBD a un equipo real)
         const effectiveHome = apiMatch.homeTeam || apiMatch.homeRef || 'TBD'
         const effectiveAway = apiMatch.awayTeam || apiMatch.awayRef || 'TBD'
 
-        if (effectiveHome !== dbMatch.home_team) {
+        // Sólo actualizamos los equipos desde la API si es fase de grupos (y estaba TBD) o es eliminatoria (>= 73)
+        // Esto evita que datos corruptos de la API sobreescriban nuestros seeds correctos de la fase de grupos.
+        const isGroupStage = dbMatch.match_number < 73;
+        const canUpdateHome = !isGroupStage || dbMatch.home_team === 'Por Definir' || dbMatch.home_team === 'TBD';
+        const canUpdateAway = !isGroupStage || dbMatch.away_team === 'Por Definir' || dbMatch.away_team === 'TBD';
+
+        if (canUpdateHome && effectiveHome !== dbMatch.home_team) {
           updatePayload.home_team = effectiveHome
           shouldUpdate = true
         }
-        if (effectiveAway !== dbMatch.away_team) {
+        if (canUpdateAway && effectiveAway !== dbMatch.away_team) {
           updatePayload.away_team = effectiveAway
           shouldUpdate = true
         }
