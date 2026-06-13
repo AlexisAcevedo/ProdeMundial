@@ -45,6 +45,30 @@ async function main() {
 
   console.log(`✅ ${teamsMap.size} equipos cargados en memoria.`);
 
+  // 2.5. Obtener partidos existentes para preservar estados/scores ya actualizados (ej: finalizados)
+  console.log("⚙️ Consultando partidos existentes en Supabase...");
+  const { data: existingMatches, error: existingError } = await supabase
+    .from('matches')
+    .select('id, status, home_score, away_score');
+
+  if (existingError) {
+    console.warn("⚠️ Advertencia: No se pudieron obtener los partidos existentes para preservar estado:", existingError.message);
+  }
+
+  const existingMatchesMap = new Map<string, { status: string; home_score: number | null; away_score: number | null }>();
+  if (!existingError && existingMatches) {
+    for (const m of existingMatches) {
+      if (m.status !== 'pending') {
+        existingMatchesMap.set(m.id, {
+          status: m.status,
+          home_score: m.home_score,
+          away_score: m.away_score,
+        });
+      }
+    }
+    console.log(`ℹ️ Preservando el estado de ${existingMatchesMap.size} partidos no pendientes.`);
+  }
+
   // 3. Mapear los Partidos
   const matchLines = matchesCsv.trim().split('\n').slice(1);
   const matchesToInsert = [];
@@ -91,15 +115,17 @@ async function main() {
       group_letter = groupMatch[1];
     }
 
+    const existingMatch = existingMatchesMap.get(matchId);
+
     matchesToInsert.push({
       id: matchId,
       match_number: matchNumber,
       home_team,
       away_team,
       kickoff_time: kickoff_at,
-      home_score: null,
-      away_score: null,
-      status: 'pending',
+      home_score: existingMatch ? existingMatch.home_score : null,
+      away_score: existingMatch ? existingMatch.away_score : null,
+      status: existingMatch ? existingMatch.status : 'pending',
       stage,
       group_letter,
     });
