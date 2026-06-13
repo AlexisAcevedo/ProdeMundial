@@ -100,15 +100,27 @@ serve(async (_req: Request) => {
 
       let updatedResults = 0
       
-      // La API de Zafronix usa IDs estilo "2026-001" que mapearemos al match_number (001 -> 1)
+      // Mapeo mixto: por equipos para fase de grupos (< 73) y por número para eliminatorias (>= 73)
+      const apiByTeams = new Map<string, ZafronixMatch>()
       const apiByNumber = new Map<number, ZafronixMatch>()
       for (const m of apiMatches) {
         const num = parseInt(m.id.split('-')[1], 10)
         apiByNumber.set(num, m)
+        if (m.homeTeam && m.awayTeam) {
+          const key = `${m.homeTeam}|${m.awayTeam}`.toLowerCase().trim()
+          apiByTeams.set(key, m)
+        }
       }
 
       for (const dbMatch of (dbMatches ?? [])) {
-        const apiMatch = apiByNumber.get(dbMatch.match_number)
+        let apiMatch: ZafronixMatch | undefined
+        if (dbMatch.match_number < 73) {
+          const key = `${dbMatch.home_team}|${dbMatch.away_team}`.toLowerCase().trim()
+          apiMatch = apiByTeams.get(key)
+        } else {
+          apiMatch = apiByNumber.get(dbMatch.match_number)
+        }
+
         if (!apiMatch) continue
 
         // Usamos el status de Zafronix si existe (live, finished, scheduled)
