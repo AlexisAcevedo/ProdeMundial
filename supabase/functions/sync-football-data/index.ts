@@ -77,19 +77,13 @@ serve(async (_req) => {
     log.push("▶ Consultando matches a Zafronix API...")
     
     const matchesEndpoint = `/matches?year=${YEAR}`
-    const matchesEtag = await getEtag(supabase, matchesEndpoint)
     const matchesHeaders: HeadersInit = { 'X-API-Key': API_KEY }
-    if (matchesEtag) matchesHeaders['If-None-Match'] = matchesEtag
 
     const matchesRes = await fetch(`${ZAFRONIX_BASE}${matchesEndpoint}`, { headers: matchesHeaders })
 
-    if (matchesRes.status === 304) {
-      log.push("✓ Matches 304 Not Modified - Skipping matches update.")
-    } else if (!matchesRes.ok) {
+    if (!matchesRes.ok) {
       throw new Error(`API matches error: ${matchesRes.status} ${await matchesRes.text()}`)
     } else {
-      const newMatchesEtag = matchesRes.headers.get('ETag')
-      if (newMatchesEtag) await saveEtag(supabase, matchesEndpoint, newMatchesEtag)
 
       const matchesData = await matchesRes.json()
       const apiMatches: ZafronixMatch[] = matchesData.data ?? []
@@ -177,19 +171,13 @@ serve(async (_req) => {
     log.push("▶ Consultando standings a Zafronix API...")
     
     const standingsEndpoint = `/standings?year=${YEAR}`
-    const standingsEtag = await getEtag(supabase, standingsEndpoint)
     const standingsHeaders: HeadersInit = { 'X-API-Key': API_KEY }
-    if (standingsEtag) standingsHeaders['If-None-Match'] = standingsEtag
 
     const standingsRes = await fetch(`${ZAFRONIX_BASE}${standingsEndpoint}`, { headers: standingsHeaders })
 
-    if (standingsRes.status === 304) {
-      log.push("✓ Standings 304 Not Modified - Skipping standings update.")
-    } else if (!standingsRes.ok) {
+    if (!standingsRes.ok) {
       throw new Error(`API standings error: ${standingsRes.status}`)
     } else {
-      const newStandingsEtag = standingsRes.headers.get('ETag')
-      if (newStandingsEtag) await saveEtag(supabase, standingsEndpoint, newStandingsEtag)
 
       const standingsData: ZafronixStandingsResponse = await standingsRes.json()
       const upsertPayload: Record<string, unknown>[] = []
