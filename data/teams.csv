@@ -1,7 +1,7 @@
 id,team_name,fifa_code,group_letter,is_placeholder
 1,Mexico,MEX,A,False
 2,South Africa,RSA,A,False
-3,South Korea,KOR,A,False
+3,Korea Republic,KOR,A,False
 4,Czechia,CZEC,A,True
 5,Canada,CAN,B,False
 6,Bosnia and Herzegovina,BOS,B,True
@@ -14,7 +14,7 @@ id,team_name,fifa_code,group_letter,is_placeholder
 13,USA,USA,D,False
 14,Paraguay,PAR,D,False
 15,Australia,AUS,D,False
-16,Turkey,TUR,D,True
+16,Türkiye,TUR,D,True
 17,Germany,GER,E,False
 18,Curaçao,CUR,E,False
 19,Côte d'Ivoire,CIV,E,False
@@ -40,7 +40,7 @@ id,team_name,fifa_code,group_letter,is_placeholder
 39,Austria,AUT,J,False
 40,Jordan,JOR,J,False
 41,Portugal,POR,K,False
-42,DR Congo,DRC,K,True
+42,Congo DR,DRC,K,True
 43,Uzbekistan,UZB,K,False
 44,Colombia,COL,K,False
 45,England,ENG,L,False
