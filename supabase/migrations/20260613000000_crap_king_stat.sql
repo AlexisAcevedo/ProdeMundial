@@ -24,7 +24,6 @@ BEGIN
     JOIN predictions p ON p.user_id = u.id
     JOIN matches m ON m.id = p.match_id
     WHERE lm.league_id = p_league_id 
-      AND m.status = 'finished' 
       AND p.points = 3
     GROUP BY u.id, u.name, u.email, u.avatar_url
     ORDER BY value DESC, u.id ASC
@@ -64,7 +63,7 @@ BEGIN
     JOIN users u ON u.id = lm.user_id
     JOIN predictions p ON p.user_id = u.id
     JOIN matches m ON m.id = p.match_id
-    WHERE lm.league_id = p_league_id AND m.status = 'finished' AND p.points = 0
+    WHERE lm.league_id = p_league_id AND p.points = 0
     GROUP BY u.id, u.name, u.email, u.avatar_url
     ORDER BY value DESC, u.id ASC
     LIMIT 3
@@ -84,7 +83,7 @@ BEGIN
       FROM league_members lm
       JOIN predictions p ON p.user_id = lm.user_id
       JOIN matches m ON m.id = p.match_id
-      WHERE lm.league_id = p_league_id AND m.status = 'finished'
+      WHERE lm.league_id = p_league_id AND p.points IS NOT NULL
     ),
     streaks AS (
       SELECT 
