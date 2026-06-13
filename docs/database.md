@@ -36,7 +36,7 @@ CREATE POLICY "Enable insert for users before cutoff" ON predictions
 
 ### Otras Políticas Relevantes
 
-- **`predictions` (SELECT)**: Un usuario solo puede leer sus propios pronósticos, excepto los pronósticos de otros usuarios en la misma liga — visibles solo 30 minutos antes del partido (comparador público).
+- **`predictions` (SELECT)**: Nadie puede leer los pronósticos de otros usuarios hasta que falten **menos de 30 minutos** para el inicio del partido. Esto bloquea cualquier intento de espiar los resultados ajenos manipulando la API.
 - **`leagues` (INSERT/UPDATE)**: Solo el creador de la liga puede modificarla.
 - **`league_members` (INSERT)**: Cualquier usuario autenticado puede unirse proveyendo el `invite_code` correcto.
 - **`league_comments` (INSERT)**: Solo los miembros activos de la liga pueden escribir en el Trash Talk.
@@ -76,7 +76,15 @@ La migración `20260605200000_security_fixes.sql` incorporó mejoras de segurida
 - Separación explícita de roles para operaciones administrativas.
 - Revisiones recomendadas por el advisor de seguridad de Supabase.
 
-## 6. Gestión de Migraciones
+## 6. Prevención de Espionaje de Pronósticos (Migración 2026-06-13)
+
+Para preservar la justicia competitiva, la base de datos restringe ahora no solo la escritura sino también la **lectura** de predicciones.
+
+La migración `20260613000001_secure_predictions_read.sql` inyectó una política RLS estricta:
+- Antes de esta migración, cualquier usuario autenticado podía interceptar el tráfico (o usar el cliente de Supabase) para ver qué habían pronosticado los líderes de la tabla.
+- Ahora, PostgreSQL devuelve vacías las filas de otros participantes hasta que se cruce el umbral de los 30 minutos previos al kickoff.
+
+## 7. Gestión de Migraciones
 
 > [!IMPORTANT]
 > El directorio `supabase/migrations/` contiene **dos tipos de archivos**:
@@ -89,7 +97,7 @@ Al utilizar **Antigravity IDE (MCP)**, la ejecución de scripts `.sql` se automa
 
 *Para despliegues manuales sin MCP*: Copiar y ejecutar cada archivo `.sql` timestampeado en orden secuencial desde el **SQL Editor** del Panel de Control de Supabase.
 
-## 7. Sincronización Automática de Partidos (API Zafronix)
+## 8. Sincronización Automática de Partidos (API Zafronix)
 
 El estado de los partidos en vivo y los resultados se sincronizan usando una **Edge Function de Supabase (`sync-football-data`)** que lee datos de la API de Zafronix.
 Esta Edge Function se ejecuta periódicamente gracias a la extensión **pg_cron** (`supabase/migrations/20240601000001_cron_sync_job.sql`).

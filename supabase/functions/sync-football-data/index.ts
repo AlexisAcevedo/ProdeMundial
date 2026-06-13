@@ -46,7 +46,9 @@ interface ZafronixStandingsResponse {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
-async function getEtag(supabase: any, endpoint: string): Promise<string | null> {
+import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+async function getEtag(supabase: SupabaseClient, endpoint: string): Promise<string | null> {
   const { data } = await supabase
     .from('api_sync_state')
     .select('etag')
@@ -55,7 +57,7 @@ async function getEtag(supabase: any, endpoint: string): Promise<string | null> 
   return data?.etag || null
 }
 
-async function saveEtag(supabase: any, endpoint: string, etag: string) {
+async function saveEtag(supabase: SupabaseClient, endpoint: string, etag: string) {
   await supabase
     .from('api_sync_state')
     .upsert({ endpoint, etag, last_sync: new Date().toISOString() })
@@ -217,10 +219,11 @@ serve(async (_req: Request) => {
       JSON.stringify({ success: true, log }),
       { headers: { "Content-Type": "application/json" }, status: 200 }
     )
-  } catch (error: any) {
-    log.push(`❌ Error: ${error.message}`)
+  } catch (error: unknown) {
+    const err = error as Error;
+    log.push(`❌ Error: ${err.message}`)
     return new Response(
-      JSON.stringify({ success: false, log, error: error.message }),
+      JSON.stringify({ success: false, log, error: "Sync failed" }),
       { headers: { "Content-Type": "application/json" }, status: 400 }
     )
   }

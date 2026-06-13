@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Match, Prediction } from '../lib/types';
 import { TeamFlag } from './MatchCard';
 import { useToast } from '../contexts/ToastContext';
@@ -36,13 +36,15 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
   }, []);
 
   // Filtrar partidos activos (predecibles)
-  const activeMatches = matches.filter((match) => {
-    const isFinished = match.status === 'finished';
-    const kickoffTime = new Date(match.kickoff_time).getTime();
-    const cutoffTime = kickoffTime - 30 * 60 * 1000;
-    const isPastCutoff = now >= cutoffTime;
-    return !isFinished && !isPastCutoff;
-  });
+  const activeMatches = useMemo(() => {
+    return matches.filter((match) => {
+      const isFinished = match.status === 'finished';
+      const kickoffTime = new Date(match.kickoff_time).getTime();
+      const cutoffTime = kickoffTime - 30 * 60 * 1000;
+      const isPastCutoff = now >= cutoffTime;
+      return !isFinished && !isPastCutoff;
+    });
+  }, [matches, now]);
 
   const [showOnlyPending, setShowOnlyPending] = useState(() => {
     return activeMatches.some((match) => !predictions.some((p) => p.match_id === match.id));
@@ -67,7 +69,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
     });
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTempPredictions(initial);
-  }, [matches, predictions]);
+  }, [activeMatches, predictions]);
 
   const handleScoreChange = (matchId: string, type: 'home' | 'away', value: string) => {
     // Filtrar caracteres que no sean dígitos

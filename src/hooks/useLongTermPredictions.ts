@@ -14,13 +14,12 @@ export function useLongTermPredictions() {
   const [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setPrediction(null);
-      setIsLoading(false);
-      return;
-    }
-
     const fetchData = async () => {
+      if (!user) {
+        setPrediction(null);
+        setIsLoading(false);
+        return;
+      }
       try {
         // Fetch current prediction
         const { data, error } = await supabase
@@ -77,9 +76,10 @@ export function useLongTermPredictions() {
       if (error) throw error;
       setPrediction(data);
       addToast('Predicción guardada correctamente', 'success');
-    } catch (err: any) {
-      console.error(err);
-      addToast(err.message || 'Error al guardar la predicción', 'error');
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error(error);
+      addToast(error.message || 'Error al guardar la predicción', 'error');
     } finally {
       setIsLoading(false);
     }

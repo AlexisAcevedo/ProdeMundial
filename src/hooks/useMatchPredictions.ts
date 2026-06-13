@@ -50,7 +50,23 @@ export function useMatchPredictions(matchId: string, isPastCutoff: boolean) {
           throw error;
         }
 
-        const formattedData = (data || []).map((item: any) => {
+        type UserRow = {
+          id: string;
+          name: string | null;
+          email: string | null;
+          avatar_url: string | null;
+        };
+
+        interface PredictionRow {
+          id: string;
+          home_score: number;
+          away_score: number;
+          points: number;
+          user_id: string;
+          users: UserRow | UserRow[] | null;
+        }
+
+        const formattedData = ((data as unknown as PredictionRow[]) || []).map((item) => {
           const userObj = Array.isArray(item.users) ? item.users[0] : item.users;
           const emailPrefix = userObj?.email ? userObj.email.split('@')[0].substring(0, 5) : 'Participante';
           const displayName = userObj?.name || emailPrefix;

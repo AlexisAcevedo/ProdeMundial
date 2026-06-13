@@ -150,7 +150,7 @@ export function LeagueChat({ leagueId }: LeagueChatProps) {
                   {/* Renderizar reacciones */}
                   {msg.reactions && msg.reactions.length > 0 && (
                     <div className={`flex flex-wrap gap-1 mt-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                      {msg.reactions.map((r: any) => {
+                      {msg.reactions.map((r: { users: string[], emoji: string, count: number }) => {
                         const hasReacted = user && r.users.includes(user.id);
                         return (
                           <button

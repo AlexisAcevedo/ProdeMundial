@@ -37,6 +37,7 @@ El torneo mundial es administrado mediante una Supabase Edge Function (`sync-foo
 - **Proveedor de Datos**: Consumimos la **Zafronix API** (especializada en el formato de 48 equipos y 12 grupos de 2026).
 - **Eficiencia y Rate Limits**: Utilizamos llamadas condicionales (`If-None-Match`) guardando el último `ETag` en la tabla `api_sync_state`. Si los datos no cambiaron, la API responde HTTP 304, permitiéndonos realizar consultas frecuentes sin consumir la cuota de peticiones gratuitas.
 - **Flujo**: La Edge Function consulta los partidos y las tablas de posiciones (standings), y actualiza las tablas `matches` y `group_standings` en PostgreSQL. Los triggers automáticos se encargan del resto (recalcular puntos).
+- **Mitigación de Fuga de Datos (OWASP A10)**: Los errores producidos en la sincronización se envuelven y los logs detallados quedan exclusivamente en el servidor de Supabase. El cliente recibe un error genérico, ocultando los detalles de la base de datos a posibles atacantes.
 
 ## Estructura del Frontend
 
@@ -104,4 +105,5 @@ El torneo mundial es administrado mediante una Supabase Edge Function (`sync-foo
 - **Toast Context Global**: `ToastContext` provee notificaciones flotantes accesibles desde cualquier hook o componente sin prop-drilling.
 - **Estilos Basados en Utilidades (Tailwind v4)**: Configuración CSS-first sin archivos de configuración JS. Soporta modo oscuro y diseño glassmorphism.
 - **Optimización de Reconciliación en React**: Uso estratégico de la propiedad `key` en componentes renderizados condicionalmente para evitar reciclaje erróneo de nodos del DOM durante transiciones CSS.
+- **Evitación de Renders en Cascada**: Los hooks encargados de sincronizar la base de datos con la UI usan inicializaciones diferidas (lazy state) e impiden la sobreescritura sincrónica desde los `useEffect`, logrando actualizaciones de estado limpias y veloces.
 - **Realtime por Suscripción**: `useRealtimeLeagueStandings` y `useLeagueChat` usan canales de Supabase Realtime (Postgres Changes + Broadcast) para sincronización instantánea sin polling.

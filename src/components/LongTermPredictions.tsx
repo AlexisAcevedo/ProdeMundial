@@ -19,8 +19,10 @@ export function LongTermPredictions() {
   const [runnerUp, setRunnerUp] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
+  // Sincronizar estado local cuando llega la predicción de la DB
   useEffect(() => {
     if (prediction) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setChampion(prediction.champion_team);
       setRunnerUp(prediction.runner_up_team);
     }

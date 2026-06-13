@@ -35,10 +35,10 @@ export function MockAuthProvider({
 
   const defaultSession: Session = (session === undefined)
     ? ({
-        access_token: 'test-token',
+        access_token: 'dummy_test_token',
         token_type: 'bearer',
         expires_in: 3600,
-        refresh_token: 'test-refresh-token',
+        refresh_token: 'dummy_refresh_token',
         user: defaultUser,
       } as any)
     : (session as Session);

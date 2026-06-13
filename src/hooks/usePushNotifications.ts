@@ -10,7 +10,7 @@ const VAPID_PUBLIC_KEY = 'BNVaRuZNBaay8ogvUFTilreNR_lVOkjaIKkRGLNVEvFDXpFuJFv5FE
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
+    .replace(/-/g, '+')
     .replace(/_/g, '/');
 
   const rawData = window.atob(base64);
@@ -25,17 +25,12 @@ function urlBase64ToUint8Array(base64String: string) {
 export function usePushNotifications() {
   const { user } = useAuth();
   const { addToast } = useToast();
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported] = useState(() => {
+    return 'serviceWorker' in navigator && 'PushManager' in window;
+  });
   const [isSubscribed, setIsSubscribed] = useState(false);
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      setIsSupported(true);
-      checkSubscription();
-    }
-  }, []);
-
-  const checkSubscription = async () => {
+  async function checkSubscription() {
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
@@ -43,8 +38,14 @@ export function usePushNotifications() {
     } catch (err) {
       console.error('Error checking subscription', err);
     }
-  };
+  }
 
+  useEffect(() => {
+    if (isSupported) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      checkSubscription();
+    }
+  }, [isSupported]);
   const subscribeToPush = async () => {
     if (!user) {
       addToast('Debes iniciar sesión para recibir notificaciones', 'error');
@@ -78,7 +79,7 @@ export function usePushNotifications() {
 
       setIsSubscribed(true);
       addToast('¡Notificaciones activadas!', 'success');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error subscribing to push:', err);
       addToast('Error al activar notificaciones. Puede que hayas denegado el permiso.', 'error');
     }

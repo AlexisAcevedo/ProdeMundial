@@ -35,9 +35,10 @@ export function useCommentReactions() {
 
         if (error) throw error;
       }
-    } catch (err: any) {
-      console.error(err);
-      addToast(err.message || 'Error al reaccionar', 'error');
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error(error);
+      addToast(error.message || 'Error al reaccionar', 'error');
     } finally {
       setIsReacting(false);
     }

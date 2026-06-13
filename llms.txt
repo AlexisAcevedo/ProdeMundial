@@ -18,9 +18,9 @@
 `useMatchPredictions`, `useMatchLeaguePredictions`, `useCountdown`, `useTheme`
 
 ## Conceptos Clave
-- **Regla de 30 minutos (RLS)**: Los pronósticos solo pueden insertarse/actualizarse hasta 30 minutos antes del partido. Impuesto de forma inviolable por Row Level Security en PostgreSQL — no en el cliente.
+- **Regla de 30 minutos (RLS) y Anti-Espionaje**: Los pronósticos solo pueden insertarse/actualizarse hasta 30 minutos antes del partido. A su vez, la lectura de pronósticos ajenos está bloqueada antes de este umbral para evitar espionaje. Impuesto de forma inviolable por Row Level Security en PostgreSQL — no en el cliente.
 - **Motor de Puntuación Automatizado**: Trigger `on_match_finished` en BD calcula puntos automáticamente: exacto = 3 pts, resultado correcto (ganador/empate con goles diferentes) = 1 pt, incorrecto = 0 pts.
 - **Ligas Privadas**: Acceso gestionado por tabla relacional `league_members`. Requiere `invite_code` de 6 caracteres.
 - **Realtime**: `useRealtimeLeagueStandings` y `useLeagueChat` usan Supabase Realtime (Postgres Changes + Broadcast) para sincronización sin polling.
 - **Estadísticas Avanzadas**: RPCs en PostgreSQL (`get_league_stats`) calculan premios (Rey del Exacto, Mejor Racha, etc.) usando Window Functions en servidor.
-- **Sincronización Automática**: Edge Function `sync-football-data` obtiene resultados en vivo desde Zafronix API usando ETags (Conditional GETs) guardados en `api_sync_state` para evitar agotar rate limits.
+- **Sincronización Automática y Sanitización**: Edge Function `sync-football-data` obtiene resultados en vivo desde Zafronix API usando ETags (Conditional GETs) guardados en `api_sync_state` para evitar agotar rate limits. Los errores están sanitizados (OWASP A10) para evitar fuga de información sensible hacia el cliente.
