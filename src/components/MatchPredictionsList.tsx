@@ -3,12 +3,11 @@ import { useAuth } from '../hooks/useAuth';
 
 interface MatchPredictionsListProps {
   matchId: string;
-  isPastCutoff: boolean;
   isFinished: boolean;
 }
 
-export function MatchPredictionsList({ matchId, isPastCutoff, isFinished }: MatchPredictionsListProps) {
-  const { predictions, isLoading, error } = useMatchPredictions(matchId, isPastCutoff);
+export function MatchPredictionsList({ matchId, isFinished }: MatchPredictionsListProps) {
+  const { predictions, isLoading, error } = useMatchPredictions(matchId);
   const { user } = useAuth();
 
   if (isLoading) {

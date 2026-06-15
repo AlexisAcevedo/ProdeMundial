@@ -14,13 +14,13 @@ export interface MatchPrediction {
   } | null;
 }
 
-export function useMatchPredictions(matchId: string, isPastCutoff: boolean) {
+export function useMatchPredictions(matchId: string) {
   const [predictions, setPredictions] = useState<MatchPrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!matchId || !isPastCutoff) {
+    if (!matchId) {
       return;
     }
 
@@ -94,10 +94,10 @@ export function useMatchPredictions(matchId: string, isPastCutoff: boolean) {
     }
 
     fetchPredictions();
-  }, [matchId, isPastCutoff]);
+  }, [matchId]);
 
   return {
-    predictions: (!matchId || !isPastCutoff) ? [] : predictions,
+    predictions: !matchId ? [] : predictions,
     isLoading,
     error,
   };

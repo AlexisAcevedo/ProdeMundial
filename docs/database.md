@@ -36,7 +36,7 @@ CREATE POLICY "Enable insert for users before cutoff" ON predictions
 
 ### Otras Políticas Relevantes
 
-- **`predictions` (SELECT)**: Nadie puede leer los pronósticos de otros usuarios hasta que falten **menos de 30 minutos** para el inicio del partido. Esto bloquea cualquier intento de espiar los resultados ajenos manipulando la API.
+- **`predictions` (SELECT)**: Cualquiera puede leer los pronósticos de todos los usuarios en cualquier momento. Esto permite comparar los pronósticos de la comunidad desde el principio.
 - **`leagues` (INSERT/UPDATE)**: Solo el creador de la liga puede modificarla.
 - **`league_members` (INSERT)**: Cualquier usuario autenticado puede unirse proveyendo el `invite_code` correcto.
 - **`league_comments` (INSERT)**: Solo los miembros activos de la liga pueden escribir en el Trash Talk.
@@ -64,7 +64,7 @@ El sistema usa Stored Procedures (RPCs) como `get_league_stats` para calcular m�
 |--------|----------|
 | **Rey del Exacto** | Mayor cantidad de aciertos exactos (3 puntos) |
 | **El Optimista** | Suma más alta de goles totales pronosticados |
-| **Rey del Crap** | Más pronósticos errados (0 puntos) en el historial |
+| **Crapero Máximo** | Más pronósticos errados (0 puntos) en el historial |
 | **Mejor Racha** | Mayor cantidad de partidos consecutivos sumando puntos |
 
 Además, `get_global_standings` y `get_league_standings` son RPCs que calculan las tablas de posiciones agregando puntos de todas las predicciones finalizadas.
@@ -76,13 +76,7 @@ La migración `20260605200000_security_fixes.sql` incorporó mejoras de segurida
 - Separación explícita de roles para operaciones administrativas.
 - Revisiones recomendadas por el advisor de seguridad de Supabase.
 
-## 6. Prevención de Espionaje de Pronósticos (Migración 2026-06-13)
-
-Para preservar la justicia competitiva, la base de datos restringe ahora no solo la escritura sino también la **lectura** de predicciones.
-
-La migración `20260613000001_secure_predictions_read.sql` inyectó una política RLS estricta:
-- Antes de esta migración, cualquier usuario autenticado podía interceptar el tráfico (o usar el cliente de Supabase) para ver qué habían pronosticado los líderes de la tabla.
-- Ahora, PostgreSQL devuelve vacías las filas de otros participantes hasta que se cruce el umbral de los 30 minutos previos al kickoff.
+La migración `20260613000001_secure_predictions_read.sql` inicialmente restringió la lectura para evitar espionajes, pero luego la migración `20260615000000_open_predictions_read.sql` restauró la lectura abierta para permitir mayor interacción y comparaciones en tiempo real por parte de los usuarios.
 
 ## 7. Gestión de Migraciones
 

@@ -46,7 +46,7 @@ describe('MatchPredictionsList Component', () => {
 
     render(
       <MockAuthProvider>
-        <MatchPredictionsList matchId={matchId} isPastCutoff={true} isFinished={true} />
+        <MatchPredictionsList matchId={matchId} isFinished={true} />
       </MockAuthProvider>
     );
 

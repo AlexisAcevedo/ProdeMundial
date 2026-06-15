@@ -100,7 +100,7 @@ export function LeagueStats({ leagueId }: LeagueStatsProps) {
     },
     {
       id: 'crap_king',
-      title: 'Rey del Crap',
+      title: 'Crapero Máximo',
       description: 'Más pronósticos errados (0 puntos).',
       icon: '💩',
       colorClass: 'text-amber-800 dark:text-amber-600',

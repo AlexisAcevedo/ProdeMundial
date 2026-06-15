@@ -9,6 +9,7 @@ import { StandingRowSkeleton } from './Skeleton';
 import { LeagueStats } from './LeagueStats';
 import { LeagueChat } from './LeagueChat';
 import { MatchPredictionsModal } from './MatchPredictionsModal';
+import { UserPredictionsModal } from './UserPredictionsModal';
 
 interface LeagueDetailsProps {
   league: League;
@@ -22,6 +23,11 @@ export function LeagueDetails({ league, matches, onBack }: LeagueDetailsProps) {
   const { removeMember, deleteLeague, isLoading: isAdminActionLoading } = useLeagueAdmin();
   const { addToast } = useToast();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+  } | null>(null);
 
   const isOwner = league.owner_id === user?.id;
 
@@ -116,20 +122,28 @@ export function LeagueDetails({ league, matches, onBack }: LeagueDetailsProps) {
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedUser({
+                              id: participant.user_id,
+                              name: participant.display_name || 'Usuario',
+                              avatarUrl: participant.avatar_url
+                            })}
+                            className="flex items-center gap-3 text-left group/btn focus:outline-none"
+                          >
                             {participant.avatar_url ? (
-                              <img src={participant.avatar_url} alt={participant.display_name || 'Avatar'} className="h-10 w-10 rounded-xl object-cover shadow-inner border border-white/20 dark:border-white/5" />
+                              <img src={participant.avatar_url} alt={participant.display_name || 'Avatar'} className="h-10 w-10 rounded-xl object-cover shadow-inner border border-white/20 dark:border-white/5 group-hover/btn:scale-105 transition-transform" />
                             ) : (
-                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 font-bold shadow-inner border border-white/20 dark:border-white/5">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 font-bold shadow-inner border border-white/20 dark:border-white/5 group-hover/btn:scale-105 transition-transform">
                                 {participant.display_name?.charAt(0).toUpperCase() || '?'}
                               </div>
                             )}
                             <div>
-                              <div className="font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                              <div className="font-bold text-slate-900 dark:text-white group-hover/btn:text-brand-600 dark:group-hover/btn:text-brand-400 transition-colors">
                                 {participant.display_name || 'Usuario'}
                               </div>
                             </div>
-                          </div>
+                          </button>
                         </td>
                         <td className="px-6 py-4 text-right">
                           <span className="inline-block text-xl font-black text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 px-3 py-1 rounded-lg">
@@ -232,6 +246,15 @@ export function LeagueDetails({ league, matches, onBack }: LeagueDetailsProps) {
             {isAdminActionLoading ? 'Eliminando...' : 'Eliminar Liga Permanentemente'}
           </button>
         </div>
+      )}
+
+      {selectedUser && (
+        <UserPredictionsModal
+          userId={selectedUser.id}
+          userName={selectedUser.name}
+          userAvatarUrl={selectedUser.avatarUrl}
+          onClose={() => setSelectedUser(null)}
+        />
       )}
     </div>
   );

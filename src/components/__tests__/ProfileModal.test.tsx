@@ -2,6 +2,7 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ProfileModal } from '../ProfileModal';
 import { ToastProvider } from '../../contexts/ToastContext';
+import { MockAuthProvider } from '../../test/mocks/auth';
 
 vi.mock('../../lib/supabase', () => {
   const mockInstance = (globalThis as any).createSupabaseMock();
@@ -28,15 +29,17 @@ describe('ProfileModal Component', () => {
 
   test('renders current profile information in inputs', () => {
     render(
-      <ToastProvider>
-        <ProfileModal
-          userId={userId}
-          currentName={currentName}
-          currentAvatarUrl={currentAvatarUrl}
-          onClose={mockOnClose}
-          onProfileUpdate={mockOnProfileUpdate}
-        />
-      </ToastProvider>
+      <MockAuthProvider>
+        <ToastProvider>
+          <ProfileModal
+            userId={userId}
+            currentName={currentName}
+            currentAvatarUrl={currentAvatarUrl}
+            onClose={mockOnClose}
+            onProfileUpdate={mockOnProfileUpdate}
+          />
+        </ToastProvider>
+      </MockAuthProvider>
     );
 
     expect(screen.getByLabelText(/nombre/i)).toHaveValue(currentName);
@@ -48,15 +51,17 @@ describe('ProfileModal Component', () => {
     mockSupabaseInstance.mockQueryResult(mockSupabaseInstance.mockEq, null);
 
     render(
-      <ToastProvider>
-        <ProfileModal
-          userId={userId}
-          currentName={currentName}
-          currentAvatarUrl={currentAvatarUrl}
-          onClose={mockOnClose}
-          onProfileUpdate={mockOnProfileUpdate}
-        />
-      </ToastProvider>
+      <MockAuthProvider>
+        <ToastProvider>
+          <ProfileModal
+            userId={userId}
+            currentName={currentName}
+            currentAvatarUrl={currentAvatarUrl}
+            onClose={mockOnClose}
+            onProfileUpdate={mockOnProfileUpdate}
+          />
+        </ToastProvider>
+      </MockAuthProvider>
     );
 
     const nameInput = screen.getByLabelText(/nombre/i);

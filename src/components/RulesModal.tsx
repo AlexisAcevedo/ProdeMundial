@@ -102,7 +102,7 @@ export function RulesModal({ onClose }: RulesModalProps) {
                 <li className="flex items-start gap-2 bg-white/50 dark:bg-black/20 p-2.5 rounded-xl border border-amber-200/50 dark:border-amber-500/10">
                   <span className="text-base">💩</span>
                   <div>
-                    <strong className="block text-slate-900 dark:text-white">Rey del Crap</strong>
+                    <strong className="block text-slate-900 dark:text-white">Crapero Máximo</strong>
                     <span className="opacity-80">Más pronósticos errados (0 puntos).</span>
                   </div>
                 </li>

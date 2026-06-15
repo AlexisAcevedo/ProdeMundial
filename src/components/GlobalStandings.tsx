@@ -1,7 +1,14 @@
+import { useState } from 'react';
 import { useGlobalStandings } from '../hooks/useGlobalStandings';
+import { UserPredictionsModal } from './UserPredictionsModal';
 
 export function GlobalStandings() {
   const { standings, isLoading, error, userPosition } = useGlobalStandings();
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+  } | null>(null);
 
   if (isLoading) {
     return (
@@ -88,21 +95,29 @@ export function GlobalStandings() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedUser({
+                            id: participant.user_id,
+                            name: participant.display_name,
+                            avatarUrl: participant.avatar_url
+                          })}
+                          className="flex items-center gap-3 text-left group/btn focus:outline-none"
+                        >
                           {participant.avatar_url ? (
-                            <img src={participant.avatar_url} alt="" className="h-10 w-10 rounded-xl object-cover border border-slate-200 dark:border-white/10" />
+                            <img src={participant.avatar_url} alt="" className="h-10 w-10 rounded-xl object-cover border border-slate-200 dark:border-white/10 group-hover/btn:scale-105 transition-transform" />
                           ) : (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 font-bold shadow-inner border border-white/20 dark:border-white/5">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-teal/20 text-brand-600 dark:text-brand-400 font-bold shadow-inner border border-white/20 dark:border-white/5 group-hover/btn:scale-105 transition-transform">
                               {participant.display_name.charAt(0).toUpperCase()}
                             </div>
                           )}
                           <div>
-                            <div className={`font-bold text-slate-900 dark:text-white transition-colors ${isCurrentUser ? 'text-brand-600 dark:text-brand-400' : 'group-hover:text-brand-600 dark:group-hover:text-brand-400'}`}>
+                            <div className={`font-bold text-slate-900 dark:text-white transition-colors group-hover/btn:text-brand-600 dark:group-hover/btn:text-brand-400 ${isCurrentUser ? 'text-brand-600 dark:text-brand-400' : ''}`}>
                               {participant.display_name}
                               {isCurrentUser && <span className="ml-2 text-xs bg-brand-500 text-white px-1.5 py-0.5 rounded font-bold">Tú</span>}
                             </div>
                           </div>
-                        </div>
+                        </button>
                       </td>
                       <td className="px-6 py-4 text-center font-semibold text-slate-700 dark:text-slate-300">
                         {participant.exact_count}
@@ -123,6 +138,15 @@ export function GlobalStandings() {
           </div>
         )}
       </div>
+
+      {selectedUser && (
+        <UserPredictionsModal
+          userId={selectedUser.id}
+          userName={selectedUser.name}
+          userAvatarUrl={selectedUser.avatarUrl}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
     </div>
   );
 }

@@ -171,28 +171,25 @@ export function MatchCard({ match, prediction, onSubmit }: { match: Match, predi
         </form>
       )}
 
-      {(isPastCutoff || isFinished || isInProgress) && (
-        <div className="mt-4 border-t border-slate-100 pt-3 dark:border-white/5 flex flex-col z-10 relative">
-          <button
-            type="button"
-            onClick={() => setShowOthers(!showOthers)}
-            className="flex items-center justify-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 transition-colors py-1 self-center"
-          >
-            <span>{showOthers ? 'Ocultar pronósticos' : 'Ver pronósticos de otros'}</span>
-            <svg className={`w-4 h-4 transform transition-transform duration-200 ${showOthers ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {showOthers && (
-            <MatchPredictionsList
-              matchId={match.id}
-              isPastCutoff={isPastCutoff || isFinished || isInProgress}
-              isFinished={isFinished}
-            />
-          )}
-        </div>
-      )}
+      <div className="mt-4 border-t border-slate-100 pt-3 dark:border-white/5 flex flex-col z-10 relative">
+        <button
+          type="button"
+          onClick={() => setShowOthers(!showOthers)}
+          className="flex items-center justify-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 transition-colors py-1 self-center"
+        >
+          <span>{showOthers ? 'Ocultar pronósticos' : 'Ver pronósticos de otros'}</span>
+          <svg className={`w-4 h-4 transform transition-transform duration-200 ${showOthers ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        {showOthers && (
+          <MatchPredictionsList
+            matchId={match.id}
+            isFinished={isFinished}
+          />
+        )}
+      </div>
     </div>
   );
 }

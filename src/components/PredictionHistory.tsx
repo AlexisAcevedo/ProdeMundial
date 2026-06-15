@@ -187,7 +187,6 @@ export function PredictionHistory({ matches, predictions }: PredictionHistoryPro
                   <div className="mt-3 border-t border-slate-100 pt-1.5 dark:border-white/5 pl-2">
                     <MatchPredictionsList
                       matchId={match.id}
-                      isPastCutoff={true}
                       isFinished={true}
                     />
                   </div>
