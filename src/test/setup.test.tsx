@@ -1,6 +1,5 @@
 import { describe, test, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import React from 'react'
 import { MockAuthProvider } from './mocks/auth'
 import { useAuth } from '../hooks/useAuth'
 import { createSupabaseMock } from './mocks/supabase'
