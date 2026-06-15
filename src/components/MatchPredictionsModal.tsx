@@ -84,20 +84,8 @@ export function MatchPredictionsModal({ leagueId, leagueName, match, onClose }: 
                     }
                   }
                 } else {
-                  // Si no hay predicción en los resultados...
-                  // ¿Es porque es de otro usuario y el partido todavía NO está bloqueado (RLS ocultando)?
-                  // Para saber si el partido ya está bloqueado: kickoff_time - 30 minutes.
-                  const kickoff = new Date(match.kickoff_time);
-                  const lockTime = new Date(kickoff.getTime() - 30 * 60 * 1000);
-                  const isLocked = new Date() >= lockTime;
-
-                  if (!isLocked && !isMe) {
-                    predText = '🔒 Oculto';
-                    badgeStyle = 'bg-slate-100 text-slate-400 dark:bg-white/5 dark:text-slate-500 font-medium text-xs';
-                  } else {
-                    predText = 'Sin prode';
-                    badgeStyle = 'bg-slate-100 text-slate-400 dark:bg-white/5 dark:text-slate-500 font-medium text-xs';
-                  }
+                  predText = 'Sin prode';
+                  badgeStyle = 'bg-slate-100 text-slate-400 dark:bg-white/5 dark:text-slate-500 font-medium text-xs';
                 }
 
                 return (
