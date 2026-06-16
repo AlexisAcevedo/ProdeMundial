@@ -142,14 +142,14 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
       const hasChanged = updated.homeScore !== originalHome || updated.awayScore !== originalAway;
       const isComplete = updated.homeScore !== '' && updated.awayScore !== '';
 
-      // Debounce auto-guardado (300ms) si está completo y cambió
+      // Debounce auto-guardado (800ms) si está completo y cambió
       if (hasChanged && isComplete) {
         if (debounceTimers.current[matchId]) {
           clearTimeout(debounceTimers.current[matchId]);
         }
         debounceTimers.current[matchId] = setTimeout(() => {
           handleSaveMatch(matchId, updated.homeScore, updated.awayScore);
-        }, 300);
+        }, 800);
       }
 
       return {
@@ -217,7 +217,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
             Carga Rápida Inteligente
           </h4>
           <p className="text-xs text-blue-700/80 dark:text-blue-300/80 mt-1 leading-relaxed">
-            Ingresá los goles y el cursor avanzará solo. Los cambios se guardan automáticamente tras 300ms de inactividad o al presionar <kbd className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 font-mono text-[10px] text-blue-800 dark:text-blue-300">Enter</kbd>.
+            Ingresá los goles y el cursor avanzará solo. Los cambios se guardan automáticamente tras 800ms de inactividad o al presionar <kbd className="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 font-mono text-[10px] text-blue-800 dark:text-blue-300">Enter</kbd>.
           </p>
         </div>
       </div>

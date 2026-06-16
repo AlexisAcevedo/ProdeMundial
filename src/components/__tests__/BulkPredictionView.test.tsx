@@ -140,9 +140,9 @@ describe('BulkPredictionView Component', () => {
     // Cambiar Away score a '2'
     fireEvent.change(italyInput, { target: { value: '2' } });
 
-    // Avanzar temporizadores 300ms para disparar el guardado debounced
+    // Avanzar temporizadores 800ms para disparar el guardado debounced
     await act(async () => {
-      await vi.advanceTimersByTime(300);
+      await vi.advanceTimersByTime(800);
     });
 
     expect(mockSubmitBulk).toHaveBeenCalledWith([
