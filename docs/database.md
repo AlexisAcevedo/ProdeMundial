@@ -21,18 +21,29 @@ La regla fundamental del prode es evitar que alguien edite su pronóstico **desp
 > [!CAUTION]
 > La validación no se hace en React. Incluso si el cliente estuviese comprometido, la base de datos rechazaría cualquier intento de trampa.
 
-### Política Central: Cutoff de 30 Minutos
+### Política Central: Bloqueo al Kickoff del Partido
 
 ```sql
-CREATE POLICY "Enable insert for users before cutoff" ON predictions
+CREATE POLICY "Enable insert for users before kickoff" ON public.predictions
   FOR INSERT
   WITH CHECK (
-    auth.uid() = user_id AND
-    now() < (SELECT kickoff_time FROM matches WHERE id = match_id) - interval '30 minutes'
+    (SELECT auth.uid()) = user_id AND
+    now() < (SELECT kickoff_time FROM public.matches WHERE id = match_id)
+  );
+
+CREATE POLICY "Enable update for users before kickoff" ON public.predictions
+  FOR UPDATE
+  USING (
+    (SELECT auth.uid()) = user_id AND
+    now() < (SELECT kickoff_time FROM public.matches WHERE id = match_id)
+  )
+  WITH CHECK (
+    (SELECT auth.uid()) = user_id AND
+    now() < (SELECT kickoff_time FROM public.matches WHERE id = match_id)
   );
 ```
 
-**Explicación**: Solo se permite insertar o actualizar una fila en `predictions` si el usuario está autenticado (`auth.uid() = user_id`) y si la hora actual (`now()`) es menor a **30 minutos antes** del `kickoff_time`.
+**Explicación**: Solo se permite insertar o actualizar una fila en `predictions` si el usuario está autenticado y si la hora actual (`now()`) es estrictamente menor al `kickoff_time` (hora de inicio) del partido correspondiente.
 
 ### Otras Políticas Relevantes
 
@@ -93,8 +104,11 @@ Al utilizar **Antigravity IDE (MCP)**, la ejecución de scripts `.sql` se automa
 
 ## 8. Sincronización Automática de Partidos (API Zafronix)
 
-El estado de los partidos en vivo y los resultados se sincronizan usando una **Edge Function de Supabase (`sync-football-data`)** que lee datos de la API de Zafronix.
-Esta Edge Function se ejecuta periódicamente gracias a la extensión **pg_cron** (`supabase/migrations/20240601000001_cron_sync_job.sql`).
+El estado de los partidos en vivo y los resultados se sincronizan usando una **Edge Function de Supabase (`sync-football-data`)** que lee datos de la API de Zafronix. Esta Edge Function se ejecuta periódicamente gracias a la extensión **pg_cron** (actualizada en la migración `20260616130000_update_cron_frequency.sql`).
+
+*   **Frecuencia**: El cron job está configurado para correr cada **5 minutos** (`*/5 * * * *`).
+*   **Resultados en vivo**: Cuando un partido tiene el estado `in_progress` (en juego), la Edge Function actualiza continuamente los campos `home_score` y `away_score` con los goles en vivo provistos por la API. Al iniciarse un partido sin goles, se muestra `0 - 0` de forma predeterminada.
+*   **Optimización de escritura**: Para evitar triggers y broadcasts de Supabase Realtime redundantes, la Edge Function solo escribe en la base de datos si el resultado entregado por la API difiere del valor ya guardado.
 
 > [!WARNING]
 > La caché (ETag) de la API de Zafronix a veces devuelve falsos positivos (`304 Not Modified`) impidiendo la correcta actualización de los partidos. Por seguridad y fiabilidad, nuestra Edge Function tiene deshabilitada esta comprobación de cabeceras HTTP y siempre consume la respuesta en tiempo real. Esto asegura que el estado `finished` se detecte correctamente, lo cual es crítico para que se disparen los triggers de puntos en la base de datos.

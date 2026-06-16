@@ -94,7 +94,7 @@ serve(async (_req: Request) => {
       // Get db matches
       const { data: dbMatches, error: dbError } = await supabase
         .from('matches')
-        .select('id, match_number, status, home_team, away_team')
+        .select('id, match_number, status, home_team, away_team, home_score, away_score')
 
       if (dbError) throw dbError
 
@@ -144,10 +144,15 @@ serve(async (_req: Request) => {
           shouldUpdate = true
         }
 
-        if (newStatus === 'finished') {
-          updatePayload.home_score = apiMatch.homeScore
-          updatePayload.away_score = apiMatch.awayScore
-          shouldUpdate = true
+        if (newStatus === 'finished' || newStatus === 'in_progress') {
+          if (apiMatch.homeScore !== dbMatch.home_score) {
+            updatePayload.home_score = apiMatch.homeScore
+            shouldUpdate = true
+          }
+          if (apiMatch.awayScore !== dbMatch.away_score) {
+            updatePayload.away_score = apiMatch.awayScore
+            shouldUpdate = true
+          }
         }
 
         const effectiveHome = apiMatch.homeTeam || apiMatch.homeRef || 'TBD'

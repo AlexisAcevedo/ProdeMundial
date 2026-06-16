@@ -18,7 +18,7 @@ Plataforma moderna y reactiva de pronósticos deportivos diseñada para competir
     *   Carga masiva y edición individual de marcadores para fase de grupos y eliminatorias.
     *   Predicciones a largo plazo (Campeón y Subcampeón) con bonificación de puntos al final del torneo.
     *   Historial de predicciones completo.
-    *   Bloqueo automático 30 minutos antes del partido y al inicio del torneo, validado por base de datos (RLS).
+    *   Bloqueo automático en el minuto de inicio (kickoff) de cada partido, validado por base de datos (RLS).
     *   Visualización y comparación de pronósticos ajenos en tiempo real.
     *   Indicadores visuales de predicciones pendientes.
     *   Notificaciones Push (PWA) para alertar sobre partidos inminentes sin predicción.
@@ -89,7 +89,7 @@ graph TD
 
 La seguridad está blindada a nivel de base de datos. Aunque el cliente frontend fuera alterado, PostgreSQL rechaza cualquier operación inválida:
 
-1.  **Restricción de Tiempo Límite (RLS)**: Predicciones bloqueadas 30 minutos antes del partido. Las políticas RLS rechazan cualquier INSERT o UPDATE tardío.
+1.  **Restricción de Tiempo Límite (RLS)**: Predicciones bloqueadas en el minuto exacto del kickoff de cada partido. Las políticas RLS rechazan cualquier INSERT o UPDATE tardío.
 2.  **Comparación de Pronósticos Abierta**: Las predicciones de todos los participantes son legibles por cualquier usuario autenticado en todo momento para fomentar la competencia sana y la interacción.
 3.  **Sanitización de Logs Serverless**: Las Edge Functions atrapan errores de base de datos o APIs externas devolviendo respuestas genéricas (HTTP 500) al cliente, evitando fugas de información interna (mitigación OWASP A10).
 4.  **Motor de Puntos en Servidor**: Triggers transaccionales calculan los puntajes cuando el admin finaliza un partido (`finished`), garantizando coherencia instantánea.

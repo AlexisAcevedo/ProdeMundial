@@ -35,8 +35,9 @@ graph TD
 
 El torneo mundial es administrado mediante una Supabase Edge Function (`sync-football-data`) que corre periódicamente vía Cron:
 - **Proveedor de Datos**: Consumimos la **Zafronix API** (especializada en el formato de 48 equipos y 12 grupos de 2026).
-- **Eficiencia y Rate Limits**: Utilizamos llamadas condicionales (`If-None-Match`) guardando el último `ETag` en la tabla `api_sync_state`. Si los datos no cambiaron, la API responde HTTP 304, permitiéndonos realizar consultas frecuentes sin consumir la cuota de peticiones gratuitas.
-- **Flujo**: La Edge Function consulta los partidos y las tablas de posiciones (standings), y actualiza las tablas `matches` y `group_standings` en PostgreSQL. Los triggers automáticos se encargan del resto (recalcular puntos).
+- **Frecuencia e Intervalo**: El Cron Job corre cada **5 minutos** (`*/5 * * * *`) para sincronizar el estado y los goles en tiempo real de los encuentros en juego (`in_progress`).
+- **Eficiencia y Rate Limits**: Para los encuentros ya finalizados o programados, se utilizan llamadas condicionales (`If-None-Match`) guardando el último `ETag` en la tabla `api_sync_state` para evitar descargas innecesarias. Además, la Edge Function solo actualiza los marcadores en la base de datos si el marcador retornado por la API difiere del valor guardado, evitando triggers y difusiones por Supabase Realtime redundantes.
+- **Flujo**: La Edge Function consulta los partidos y las tablas de posiciones (standings), y actualiza las tablas `matches` y `group_standings` en PostgreSQL. Cuando un partido pasa a estado `finished`, el trigger automático se encarga de calcular los puntajes de los pronósticos de los usuarios.
 - **Mitigación de Fuga de Datos (OWASP A10)**: Los errores producidos en la sincronización se envuelven y los logs detallados quedan exclusivamente en el servidor de Supabase. El cliente recibe un error genérico, ocultando los detalles de la base de datos a posibles atacantes.
 
 ## Estructura del Frontend
