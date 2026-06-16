@@ -82,8 +82,8 @@ export function LongTermPredictions() {
     <div className="bg-white dark:bg-fifa-card rounded-2xl p-4 sm:p-5 border border-slate-200/50 dark:border-white/5 shadow-sm">
       <div className="flex flex-col mb-4 gap-2">
         <div>
-          <h2 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">
-            🔮 Predicciones del Torneo
+          <h2 className="text-xl font-black text-slate-800 dark:text-white">
+            Predicciones del Torneo
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Pronosticá al Campeón y Subcampeón.
