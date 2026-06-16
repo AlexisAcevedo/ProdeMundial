@@ -52,9 +52,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
     });
   }, [matches, now]);
 
-  const [showOnlyPending, setShowOnlyPending] = useState(() => {
-    return activeMatches.some((match) => !predictions.some((p) => p.match_id === match.id));
-  });
+  const [showOnlyPending, setShowOnlyPending] = useState(false);
 
   // Filtrar por pendientes si el switch está activo
   const displayedMatches = useMemo(() => {

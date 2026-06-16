@@ -76,18 +76,14 @@ describe('BulkPredictionView Component', () => {
     expect(screen.getByText(/pronósticos cerrados/i)).toBeInTheDocument();
   });
 
-  test('lists active matches and populates initial values', () => {
+  test('lists active matches and populates initial values (default to Todos)', () => {
     render(
       <ToastProvider>
         <BulkPredictionView matches={dummyMatches} predictions={dummyPredictions} onSubmitBulk={vi.fn()} />
       </ToastProvider>
     );
 
-    // Desactivar el filtro de solo pendientes para ver todos (haciendo clic en "Todos")
-    const filterButton = screen.getByRole('button', { name: /^todos$/i });
-    fireEvent.click(filterButton);
-
-    // Debe mostrar los dos partidos predecibles (Argentina vs Brazil y Spain vs Italy)
+    // Debe mostrar los dos partidos predecibles de forma predeterminada (Argentina vs Brazil y Spain vs Italy)
     expect(screen.getByText('Argentina')).toBeInTheDocument();
     expect(screen.getByText('Brazil')).toBeInTheDocument();
     expect(screen.getByText('Spain')).toBeInTheDocument();
@@ -104,6 +100,18 @@ describe('BulkPredictionView Component', () => {
     // El de Spain vs Italy debe estar vacío (o string vacío)
     expect(inputs[2]).toHaveValue('');
     expect(inputs[3]).toHaveValue('');
+
+    // Hacer clic en "Pendientes" para verificar que se filtra
+    const pendingFilterButton = screen.getByRole('button', { name: /pendientes/i });
+    fireEvent.click(pendingFilterButton);
+
+    // Ya no debe mostrar Argentina vs Brazil (que ya está predecido)
+    expect(screen.queryByText('Argentina')).not.toBeInTheDocument();
+    expect(screen.queryByText('Brazil')).not.toBeInTheDocument();
+
+    // Debe seguir mostrando Spain vs Italy (pendiente)
+    expect(screen.getByText('Spain')).toBeInTheDocument();
+    expect(screen.getByText('Italy')).toBeInTheDocument();
   });
 
   test('detects input changes, auto-focuses next input, and auto-saves after debounce', async () => {
@@ -114,11 +122,8 @@ describe('BulkPredictionView Component', () => {
         <BulkPredictionView matches={dummyMatches} predictions={dummyPredictions} onSubmitBulk={mockSubmitBulk} />
       </ToastProvider>
     );
-    // Desactivar el filtro de solo pendientes (haciendo clic en "Todos")
-    const filterButton = screen.getByRole('button', { name: /^todos$/i });
-    fireEvent.click(filterButton);
 
-    // Obtener inputs del partido Spain vs Italy
+    // Obtener inputs del partido Spain vs Italy (ya están en pantalla porque "Todos" es default)
     const inputs = screen.getAllByRole('textbox');
     const spainInput = inputs[2];
     const italyInput = inputs[3];
