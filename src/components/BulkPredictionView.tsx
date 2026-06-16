@@ -231,7 +231,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
             onClick={() => setShowOnlyPending(false)}
             className={`flex-1 rounded-lg py-1.5 px-3 text-xs font-bold transition-all ${
               !showOnlyPending
-                ? 'bg-white text-slate-800 shadow-sm dark:bg-fifa-card dark:text-white'
+                ? 'bg-brand-600 text-white shadow-md'
                 : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
@@ -242,7 +242,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
             onClick={() => setShowOnlyPending(true)}
             className={`flex-1 rounded-lg py-1.5 px-3 text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
               showOnlyPending
-                ? 'bg-amber-500 text-white shadow-sm'
+                ? 'bg-amber-500 text-white shadow-md'
                 : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
