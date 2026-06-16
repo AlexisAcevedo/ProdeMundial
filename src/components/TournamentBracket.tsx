@@ -94,9 +94,9 @@ export function BracketMatchCard({
               {match.home_team}
             </span>
           </div>
-          {isFinished || match.status === 'in_progress' ? (
+          {isFinished ? (
             <span className={`text-sm tabular-nums ${homeWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-bold text-slate-800 dark:text-slate-100'}`}>
-              {match.home_score ?? 0}
+              {match.home_score}
             </span>
           ) : canPredict ? (
             <input
@@ -119,9 +119,9 @@ export function BracketMatchCard({
               {match.away_team}
             </span>
           </div>
-          {isFinished || match.status === 'in_progress' ? (
+          {isFinished ? (
             <span className={`text-sm tabular-nums ${awayWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-bold text-slate-800 dark:text-slate-100'}`}>
-              {match.away_score ?? 0}
+              {match.away_score}
             </span>
           ) : canPredict ? (
             <input
