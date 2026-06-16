@@ -26,8 +26,7 @@ export function MiniMatchCard({ match, prediction, onSubmit }: { match: Match, p
   const isFinished = match.status === 'finished';
   const isInProgress = match.status === 'in_progress';
   const kickoffTime = new Date(match.kickoff_time).getTime();
-  const cutoffTime = kickoffTime - 30 * 60 * 1000;
-  const isPastCutoff = now >= cutoffTime;
+  const isPastCutoff = now >= kickoffTime;
   const canPredict = !isFinished && !isInProgress && !isPastCutoff;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,7 +66,7 @@ export function MiniMatchCard({ match, prediction, onSubmit }: { match: Match, p
                 Finalizado
               </span>
             ) : (
-               <CountdownTimer targetDate={cutoffTime} />
+               <CountdownTimer targetDate={kickoffTime} />
             )}
           </div>
         </div>

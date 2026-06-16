@@ -38,8 +38,7 @@ export function BracketMatchCard({
 
   const isFinished = match.status === 'finished';
   const kickoffTime = new Date(match.kickoff_time).getTime();
-  const cutoffTime = kickoffTime - 30 * 60 * 1000;
-  const isPastCutoff = now >= cutoffTime;
+  const isPastCutoff = now >= kickoffTime;
   const canPredict = !isFinished && !isPastCutoff;
 
   const handleSubmit = async (e: React.FormEvent) => {

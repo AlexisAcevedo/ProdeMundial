@@ -21,7 +21,7 @@ describe('BulkPredictionView Component', () => {
       match_number: 1,
       home_team: 'Argentina',
       away_team: 'Brazil',
-      kickoff_time: '2026-05-31T13:00:00Z', // cutoff: 12:30 (dentro de 30 mins) -> Predecible
+      kickoff_time: '2026-05-31T13:00:00Z', // kickoff: 13:00 (dentro de 1 hora) -> Predecible
       home_score: null,
       away_score: null,
       status: 'pending',
@@ -33,7 +33,7 @@ describe('BulkPredictionView Component', () => {
       match_number: 2,
       home_team: 'France',
       away_team: 'Germany',
-      kickoff_time: '2026-05-31T11:45:00Z', // cutoff: 11:15 (ya pasó) -> Cerrado/Expirado
+      kickoff_time: '2026-05-31T11:45:00Z', // kickoff: 11:45 (ya comenzó) -> Cerrado/Expirado
       home_score: null,
       away_score: null,
       status: 'pending',
@@ -45,7 +45,7 @@ describe('BulkPredictionView Component', () => {
       match_number: 3,
       home_team: 'Spain',
       away_team: 'Italy',
-      kickoff_time: '2026-06-01T15:00:00Z', // cutoff: 14:30 del día siguiente -> Predecible
+      kickoff_time: '2026-06-01T15:00:00Z', // kickoff: mañana a las 15:00 -> Predecible
       home_score: null,
       away_score: null,
       status: 'pending',

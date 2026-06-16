@@ -40,8 +40,7 @@ export function BulkPredictionView({ matches, predictions, onSubmitBulk }: BulkP
     return matches.filter((match) => {
       const isFinished = match.status === 'finished';
       const kickoffTime = new Date(match.kickoff_time).getTime();
-      const cutoffTime = kickoffTime - 30 * 60 * 1000;
-      const isPastCutoff = now >= cutoffTime;
+      const isPastCutoff = now >= kickoffTime;
       return !isFinished && !isPastCutoff;
     });
   }, [matches, now]);

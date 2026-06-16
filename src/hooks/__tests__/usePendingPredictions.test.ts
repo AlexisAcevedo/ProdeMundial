@@ -78,23 +78,25 @@ describe('usePendingPredictions Hook', () => {
   test('filters matches and identifies pending ones correctly', () => {
     const { result } = renderHook(() => usePendingPredictions(dummyMatches, dummyPredictions));
 
-    expect(result.current.pendingCount).toBe(1);
-    expect(result.current.pendingMatches).toHaveLength(1);
-    expect(result.current.pendingMatches[0].id).toBe('match-1');
+    expect(result.current.pendingCount).toBe(2);
+    expect(result.current.pendingMatches).toHaveLength(2);
+    expect(result.current.pendingMatches[0].id).toBe('match-3');
+    expect(result.current.pendingMatches[1].id).toBe('match-1');
   });
 
-  test('calculates correct nextDeadline (30m before kickoff of nearest match)', () => {
+  test('calculates correct nextDeadline (exactly kickoff of nearest match)', () => {
     const { result } = renderHook(() => usePendingPredictions(dummyMatches, dummyPredictions));
 
-    // match-1 kickoff is 13:00, deadline should be 12:30
+    // match-3 kickoff is 12:15, which is the nearest deadline
     expect(result.current.nextDeadline).not.toBeNull();
-    expect(result.current.nextDeadline?.toISOString()).toBe('2026-05-31T12:30:00.000Z');
+    expect(result.current.nextDeadline?.toISOString()).toBe('2026-05-31T12:15:00.000Z');
   });
 
   test('returns 0 pending count when all are predicted or finished', () => {
     const predictionsAll: Prediction[] = [
       { id: 'p1', user_id: 'u1', match_id: 'match-1', home_score: 1, away_score: 0, points: 0 },
       { id: 'p2', user_id: 'u1', match_id: 'match-2', home_score: 2, away_score: 1, points: 0 },
+      { id: 'p3', user_id: 'u1', match_id: 'match-3', home_score: 0, away_score: 0, points: 0 },
     ];
 
     const { result } = renderHook(() => usePendingPredictions(dummyMatches, predictionsAll));

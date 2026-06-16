@@ -14,17 +14,16 @@ export function usePendingPredictions(matches: Match[], predictions: Prediction[
       // 1. No finalizado
       if (match.status === 'finished') return false;
 
-      // 2. No pasado el cutoff (30 min antes de kickoff)
+      // 2. No pasado el inicio del partido (kickoff)
       const kickoffTime = new Date(match.kickoff_time).getTime();
-      const cutoffTime = kickoffTime - 30 * 60 * 1000;
-      if (now >= cutoffTime) return false;
+      if (now >= kickoffTime) return false;
 
       // 3. No tiene predicción
       const hasPrediction = predictions.some((p) => p.match_id === match.id);
       return !hasPrediction;
     });
 
-    // Ordenar por cutoff más cercano (kickoff más cercano)
+    // Ordenar por kickoff más cercano
     pendingMatches.sort((a, b) => new Date(a.kickoff_time).getTime() - new Date(b.kickoff_time).getTime());
 
     const pendingCount = pendingMatches.length;
@@ -32,7 +31,7 @@ export function usePendingPredictions(matches: Match[], predictions: Prediction[
     let nextDeadline: Date | null = null;
     if (pendingCount > 0) {
       const firstMatchKickoff = new Date(pendingMatches[0].kickoff_time).getTime();
-      nextDeadline = new Date(firstMatchKickoff - 30 * 60 * 1000);
+      nextDeadline = new Date(firstMatchKickoff);
     }
 
     return {
