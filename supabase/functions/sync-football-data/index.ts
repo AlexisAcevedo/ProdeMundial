@@ -94,7 +94,7 @@ serve(async (_req: Request) => {
       // Get db matches
       const { data: dbMatches, error: dbError } = await supabase
         .from('matches')
-        .select('id, match_number, status, home_team, away_team')
+        .select('id, match_number, status, home_team, away_team, home_score, away_score')
 
       if (dbError) throw dbError
 
@@ -144,7 +144,10 @@ serve(async (_req: Request) => {
           shouldUpdate = true
         }
 
-        if (newStatus === 'finished') {
+        // Solo escribimos scores si la DB no tiene todavía (primera vez que termina).
+        // Esto protege correcciones manuales cuando la API tiene datos incorrectos.
+        const dbHasScores = dbMatch.home_score !== null && dbMatch.away_score !== null
+        if (newStatus === 'finished' && !dbHasScores) {
           updatePayload.home_score = apiMatch.homeScore
           updatePayload.away_score = apiMatch.awayScore
           shouldUpdate = true
