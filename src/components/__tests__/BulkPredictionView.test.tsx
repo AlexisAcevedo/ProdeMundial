@@ -83,8 +83,8 @@ describe('BulkPredictionView Component', () => {
       </ToastProvider>
     );
 
-    // Desactivar el filtro de solo pendientes para ver todos
-    const filterButton = screen.getByRole('button', { name: /solo pendientes/i });
+    // Desactivar el filtro de solo pendientes para ver todos (haciendo clic en "Todos")
+    const filterButton = screen.getByRole('button', { name: /^todos$/i });
     fireEvent.click(filterButton);
 
     // Debe mostrar los dos partidos predecibles (Argentina vs Brazil y Spain vs Italy)
@@ -106,7 +106,7 @@ describe('BulkPredictionView Component', () => {
     expect(inputs[3]).toHaveValue('');
   });
 
-  test('detects input changes, displays save button, and submits successfully', async () => {
+  test('detects input changes, auto-focuses next input, and auto-saves after debounce', async () => {
     const mockSubmitBulk = vi.fn().mockResolvedValue([]);
     
     render(
@@ -114,29 +114,30 @@ describe('BulkPredictionView Component', () => {
         <BulkPredictionView matches={dummyMatches} predictions={dummyPredictions} onSubmitBulk={mockSubmitBulk} />
       </ToastProvider>
     );
-    // Desactivar el filtro de solo pendientes
-    const filterButton = screen.getByRole('button', { name: /solo pendientes/i });
+    // Desactivar el filtro de solo pendientes (haciendo clic en "Todos")
+    const filterButton = screen.getByRole('button', { name: /^todos$/i });
     fireEvent.click(filterButton);
-
-    // Inicialmente no debe mostrar el botón de guardar porque no hay cambios
-    expect(screen.queryByRole('button', { name: /guardar/i })).not.toBeInTheDocument();
 
     // Obtener inputs del partido Spain vs Italy
     const inputs = screen.getAllByRole('textbox');
     const spainInput = inputs[2];
     const italyInput = inputs[3];
 
-    // Cambiar scores
+    // Cambiar Home score a '3'
     fireEvent.change(spainInput, { target: { value: '3' } });
+
+    // Verificar que el cursor salta automáticamente a italyInput
+    act(() => {
+      vi.advanceTimersByTime(10);
+    });
+    expect(document.activeElement).toBe(italyInput);
+
+    // Cambiar Away score a '2'
     fireEvent.change(italyInput, { target: { value: '2' } });
 
-    // Ahora debe aparecer el botón de guardar
-    const saveButton = screen.getByRole('button', { name: /guardar 1 pronósticos/i });
-    expect(saveButton).toBeInTheDocument();
-
-    // Enviar cambios
+    // Avanzar temporizadores 300ms para disparar el guardado debounced
     await act(async () => {
-      fireEvent.click(saveButton);
+      await vi.advanceTimersByTime(300);
     });
 
     expect(mockSubmitBulk).toHaveBeenCalledWith([
