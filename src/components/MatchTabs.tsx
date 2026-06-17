@@ -33,23 +33,23 @@ export function MatchTabs({
 
   const { pendingCount } = usePendingPredictions(matches, predictions);
 
-  const tabs: { id: Tab; label: string; icon: string; badge?: number }[] = [
-    { id: 'groups', label: 'Grupos', icon: '🏟️' },
-    { id: 'bracket', label: 'Fase Final', icon: '🏆' },
-    { id: 'bulk', label: 'Carga Rápida', icon: '📥', badge: pendingCount },
-    { id: 'history', label: 'Historial', icon: '📜' },
-    { id: 'ranking', label: 'Ranking', icon: '🏅' },
+  const tabs: { id: Tab; label: string; shortLabel: string; icon: string; badge?: number }[] = [
+    { id: 'groups', label: 'Grupos', shortLabel: 'Grupos', icon: '🏟️' },
+    { id: 'bracket', label: 'Fase Final', shortLabel: 'Final', icon: '🏆' },
+    { id: 'bulk', label: 'Carga Rápida', shortLabel: 'Rápida', icon: '📥', badge: pendingCount },
+    { id: 'history', label: 'Historial', shortLabel: 'Historial', icon: '📜' },
+    { id: 'ranking', label: 'Ranking', shortLabel: 'Ranking', icon: '🏅' },
   ];
 
   return (
     <div>
       {/* Tab bar */}
-      <div className="mb-8 flex gap-2 rounded-2xl bg-white/50 p-1.5 shadow-sm backdrop-blur-md dark:bg-fifa-card/50 border border-slate-200/50 dark:border-white/5 overflow-x-auto scrollbar-none">
+      <div className="mb-8 flex gap-1 sm:gap-2 rounded-2xl bg-white/50 p-1 sm:p-1.5 shadow-sm backdrop-blur-md dark:bg-fifa-card/50 border border-slate-200/50 dark:border-white/5">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`relative flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all duration-300 overflow-hidden min-w-[100px] ${
+            className={`relative flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-xl px-1 sm:px-4 py-2.5 sm:py-3 text-sm font-bold transition-all duration-300 overflow-hidden whitespace-nowrap ${
               activeTab === tab.id
                 ? 'text-white shadow-md'
                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/5'
@@ -58,10 +58,13 @@ export function MatchTabs({
             {activeTab === tab.id && (
               <div className="absolute inset-0 bg-gradient-to-r from-brand-600 to-brand-500 z-0"></div>
             )}
-            <span className="text-lg relative z-10">{tab.icon}</span>
-            <span className="hidden sm:inline relative z-10 tracking-wide">{tab.label}</span>
+            <span className="text-sm sm:text-lg relative z-10">{tab.icon}</span>
+            <span className="text-[10px] sm:text-sm relative z-10 tracking-wide">
+              <span className="sm:hidden">{tab.shortLabel}</span>
+              <span className="hidden sm:inline">{tab.label}</span>
+            </span>
             {tab.badge !== undefined && tab.badge > 0 && (
-              <div className="relative z-10">
+              <div className="absolute -top-0.5 -right-0.5 sm:relative sm:top-auto sm:right-auto z-10">
                 <PendingBadge count={tab.badge} />
               </div>
             )}
