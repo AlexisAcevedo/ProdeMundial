@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -264,6 +264,7 @@ export type Database = {
           home_team: string
           id: string
           kickoff_time: string
+          manual_override: boolean
           match_number: number | null
           stage: string
           status: string
@@ -276,6 +277,7 @@ export type Database = {
           home_team: string
           id?: string
           kickoff_time: string
+          manual_override?: boolean
           match_number?: number | null
           stage?: string
           status?: string
@@ -288,6 +290,7 @@ export type Database = {
           home_team?: string
           id?: string
           kickoff_time?: string
+          manual_override?: boolean
           match_number?: number | null
           stage?: string
           status?: string

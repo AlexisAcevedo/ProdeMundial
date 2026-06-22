@@ -94,11 +94,12 @@ serve(async (_req: Request) => {
       // Get db matches
       const { data: dbMatches, error: dbError } = await supabase
         .from('matches')
-        .select('id, match_number, status, home_team, away_team, home_score, away_score')
+        .select('id, match_number, status, home_team, away_team, home_score, away_score, manual_override')
 
       if (dbError) throw dbError
 
       let updatedResults = 0
+      let skippedOverrides = 0
       
       // Mapeo mixto: por equipos para fase de grupos (< 73) y por número para eliminatorias (>= 73)
       const apiByTeams = new Map<string, ZafronixMatch>()
@@ -122,6 +123,12 @@ serve(async (_req: Request) => {
         }
 
         if (!apiMatch) continue
+
+        // Si el partido tiene override manual, no tocamos nada (ej: suspendido por lluvia)
+        if (dbMatch.manual_override) {
+          skippedOverrides++
+          continue
+        }
 
         // Usamos el status de Zafronix si existe (live, finished, scheduled)
         let newStatus = dbMatch.status
@@ -185,6 +192,9 @@ serve(async (_req: Request) => {
         }
       }
       log.push(`✓ ${updatedResults} partidos actualizados.`)
+      if (skippedOverrides > 0) {
+        log.push(`⏸ ${skippedOverrides} partidos con override manual ignorados.`)
+      }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
