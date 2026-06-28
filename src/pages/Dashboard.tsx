@@ -27,7 +27,7 @@ export function Dashboard() {
   const [inviteCode, setInviteCode] = useState('');
   const [newLeagueName, setNewLeagueName] = useState('');
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
-  const [activeTab, setActiveTab] = useState<'groups' | 'bracket' | 'ranking' | 'history' | 'bulk'>('groups');
+  const [activeTab, setActiveTab] = useState<'groups' | 'bracket' | 'ranking' | 'history' | 'bulk'>('bracket');
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [profile, setProfile] = useState<{ name: string | null; avatar_url: string | null }>({ name: null, avatar_url: null });
