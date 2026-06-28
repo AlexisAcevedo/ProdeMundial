@@ -52,6 +52,60 @@ export const TEAM_FLAG_MAP: Record<string, string> = {
   'Korea Republic': 'kr',
 };
 
+const TEAM_SHORT_NAME: Record<string, string> = {
+  'Mexico': 'MEX',
+  'South Africa': 'RSA',
+  'South Korea': 'KOR',
+  'Czechia': 'CZE',
+  'Canada': 'CAN',
+  'Bosnia and Herzegovina': 'BIH',
+  'Qatar': 'QAT',
+  'Switzerland': 'SUI',
+  'Brazil': 'BRA',
+  'Morocco': 'MAR',
+  'Haiti': 'HAI',
+  'Scotland': 'SCO',
+  'USA': 'USA',
+  'Paraguay': 'PAR',
+  'Australia': 'AUS',
+  'Turkey': 'TUR',
+  'Germany': 'GER',
+  'Curaçao': 'CUW',
+  "Côte d'Ivoire": 'CIV',
+  'Ecuador': 'ECU',
+  'Netherlands': 'NED',
+  'Japan': 'JPN',
+  'Sweden': 'SWE',
+  'Tunisia': 'TUN',
+  'Belgium': 'BEL',
+  'Egypt': 'EGY',
+  'IR Iran': 'IRN',
+  'New Zealand': 'NZL',
+  'Spain': 'ESP',
+  'Cabo Verde': 'CPV',
+  'Saudi Arabia': 'KSA',
+  'Uruguay': 'URU',
+  'France': 'FRA',
+  'Senegal': 'SEN',
+  'Iraq': 'IRQ',
+  'Norway': 'NOR',
+  'Argentina': 'ARG',
+  'Algeria': 'ALG',
+  'Austria': 'AUT',
+  'Jordan': 'JOR',
+  'Portugal': 'POR',
+  'DR Congo': 'COD',
+  'Congo DR': 'COD',
+  'Uzbekistan': 'UZB',
+  'Colombia': 'COL',
+  'England': 'ENG',
+  'Croatia': 'CRO',
+  'Ghana': 'GHA',
+  'Panama': 'PAN',
+  'Türkiye': 'TUR',
+  'Korea Republic': 'KOR',
+};
+
 /**
  * Returns the ISO 3166-1 alpha-2 code or subdivision code for flag-icons
  * corresponding to the given team name. Returns null if no flag mapping exists
@@ -60,4 +114,13 @@ export const TEAM_FLAG_MAP: Record<string, string> = {
 export function getTeamFlagCode(teamName: string): string | null {
   if (!teamName) return null;
   return TEAM_FLAG_MAP[teamName] || null;
+}
+
+/**
+ * Returns the FIFA 3-letter short name for a team.
+ * Falls back to the first 3 characters uppercased if not found.
+ */
+export function getTeamShortName(teamName: string): string {
+  if (!teamName) return '???';
+  return TEAM_SHORT_NAME[teamName] || teamName.slice(0, 3).toUpperCase();
 }

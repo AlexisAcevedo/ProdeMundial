@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Match, Prediction } from '../lib/types';
 import { TeamFlag } from './MatchCard';
+import { getTeamShortName } from '../lib/teamFlags';
 
 const LEFT_R32 = [73, 75, 74, 77, 83, 84, 81, 82];
 const LEFT_R16 = [89, 90, 93, 94];
@@ -91,7 +92,7 @@ export function BracketMatchCard({
           <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
             <TeamFlag teamName={match.home_team} />
             <span className={`truncate text-xs ${homeWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-semibold text-slate-700 dark:text-slate-200'}`}>
-              {match.home_team}
+              {getTeamShortName(match.home_team)}
             </span>
           </div>
           {isFinished ? (
@@ -116,7 +117,7 @@ export function BracketMatchCard({
           <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5">
             <TeamFlag teamName={match.away_team} />
             <span className={`truncate text-xs ${awayWins ? 'font-extrabold text-brand-700 dark:text-brand-400' : 'font-semibold text-slate-700 dark:text-slate-200'}`}>
-              {match.away_team}
+              {getTeamShortName(match.away_team)}
             </span>
           </div>
           {isFinished ? (

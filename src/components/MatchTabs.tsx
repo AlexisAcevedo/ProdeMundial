@@ -26,7 +26,7 @@ export function MatchTabs({
   activeTab?: Tab;
   setActiveTab?: (tab: Tab) => void;
 }) {
-  const [localActiveTab, localSetActiveTab] = useState<Tab>('groups');
+  const [localActiveTab, localSetActiveTab] = useState<Tab>('bracket');
   const activeTab = controlledActiveTab ?? localActiveTab;
   const setActiveTab = controlledSetActiveTab ?? localSetActiveTab;
   const [selectedGroup, setSelectedGroup] = useState('A');
