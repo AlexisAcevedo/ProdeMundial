@@ -160,20 +160,26 @@ serve(async (_req: Request) => {
           shouldUpdate = true
         }
 
-        const effectiveHome = apiMatch.homeTeam || apiMatch.homeRef || 'TBD'
-        const effectiveAway = apiMatch.awayTeam || apiMatch.awayRef || 'TBD'
+        // Para eliminatorias, solo usamos homeTeam/awayTeam reales de la API (NO homeRef que son placeholders como "1A").
+        // Para grupos, el fallback a homeRef es seguro porque siempre son nombres reales.
+        const isGroupStage = dbMatch.match_number < 73;
+        const effectiveHome = isGroupStage
+          ? (apiMatch.homeTeam || apiMatch.homeRef || 'TBD')
+          : (apiMatch.homeTeam || null)
+        const effectiveAway = isGroupStage
+          ? (apiMatch.awayTeam || apiMatch.awayRef || 'TBD')
+          : (apiMatch.awayTeam || null)
 
         // Sólo actualizamos los equipos desde la API si es fase de grupos (y estaba TBD) o es eliminatoria (>= 73)
         // Esto evita que datos corruptos de la API sobreescriban nuestros seeds correctos de la fase de grupos.
-        const isGroupStage = dbMatch.match_number < 73;
         const canUpdateHome = !isGroupStage || dbMatch.home_team === 'Por Definir' || dbMatch.home_team === 'TBD';
         const canUpdateAway = !isGroupStage || dbMatch.away_team === 'Por Definir' || dbMatch.away_team === 'TBD';
 
-        if (canUpdateHome && effectiveHome !== dbMatch.home_team) {
+        if (canUpdateHome && effectiveHome && effectiveHome !== dbMatch.home_team) {
           updatePayload.home_team = effectiveHome
           shouldUpdate = true
         }
-        if (canUpdateAway && effectiveAway !== dbMatch.away_team) {
+        if (canUpdateAway && effectiveAway && effectiveAway !== dbMatch.away_team) {
           updatePayload.away_team = effectiveAway
           shouldUpdate = true
         }
