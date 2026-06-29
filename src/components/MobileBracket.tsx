@@ -3,7 +3,7 @@ import type { Match, Prediction } from '../lib/types';
 import { BracketMatchCard } from './TournamentBracket';
 
 const R32_NUMBERS = [73, 75, 74, 77, 83, 84, 81, 82, 76, 78, 79, 80, 86, 88, 85, 87];
-const R16_NUMBERS = [89, 90, 93, 94, 91, 92, 95, 96];
+const R16_NUMBERS = [90, 89, 93, 94, 91, 92, 95, 96];
 const QF_NUMBERS = [97, 98, 99, 100];
 const SF_NUMBERS = [101, 102];
 const FINAL_NUMBERS = [104, 103]; // Final y 3er Puesto
