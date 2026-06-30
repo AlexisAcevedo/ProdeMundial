@@ -3,8 +3,8 @@ import type { Match, Prediction } from '../lib/types';
 import { TeamFlag } from './MatchCard';
 import { getTeamShortName } from '../lib/teamFlags';
 
-const LEFT_R32 = [73, 75, 74, 77, 83, 84, 81, 82];
-const LEFT_R16 = [90, 89, 93, 94];
+const LEFT_R32 = [74, 77, 73, 75, 83, 84, 81, 82];
+const LEFT_R16 = [89, 90, 93, 94];
 const LEFT_QF = [97, 98];
 const LEFT_SF = [101];
 
