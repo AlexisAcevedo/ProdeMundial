@@ -13,7 +13,19 @@ DECLARE
   v_loser  TEXT;
   v_w_ref  TEXT;
   v_l_ref  TEXT;
+  v_is_propagating BOOLEAN;
 BEGIN
+  -- Guard: evitar recursión usando variable de sesión
+  BEGIN
+    v_is_propagating := current_setting('app.propagating_winner')::boolean;
+  EXCEPTION WHEN OTHERS THEN
+    v_is_propagating := false;
+  END;
+
+  IF v_is_propagating THEN
+    RETURN NEW;
+  END IF;
+
   IF NEW.status != 'finished' OR OLD.status = 'finished' THEN
     RETURN NEW;
   END IF;
@@ -45,11 +57,16 @@ BEGIN
   v_w_ref := 'W' || NEW.match_number;
   v_l_ref := 'L' || NEW.match_number;
 
+  -- Setear flag anti-recursión (true = transaccional, se limpia al fin del tx)
+  PERFORM set_config('app.propagating_winner', 'true', true);
+
   UPDATE matches SET home_team = v_winner WHERE home_team = v_w_ref;
   UPDATE matches SET away_team = v_winner WHERE away_team = v_w_ref;
 
   UPDATE matches SET home_team = v_loser WHERE home_team = v_l_ref;
   UPDATE matches SET away_team = v_loser WHERE away_team = v_l_ref;
+
+  PERFORM set_config('app.propagating_winner', 'false', true);
 
   RETURN NEW;
 END;
