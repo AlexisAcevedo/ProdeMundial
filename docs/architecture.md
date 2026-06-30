@@ -23,6 +23,7 @@ graph TD
     SBClient -->|WebSockets| SBRealtime[Supabase Realtime]
 
     SBDB -->|Triggers SQL| Score[Motor de Puntaje Automatizado]
+    SBDB -->|Triggers SQL| Bracket[Propagación de Ganadores en Bracket]
     SBDB -->|Postgres Changes| SBRealtime
     SBRealtime -->|useRealtimeLeagueStandings| Hooks
     
@@ -36,8 +37,10 @@ graph TD
 El torneo mundial es administrado mediante una Supabase Edge Function (`sync-football-data`) que corre periódicamente vía Cron:
 - **Proveedor de Datos**: Consumimos la **Zafronix API** (especializada en el formato de 48 equipos y 12 grupos de 2026).
 - **Frecuencia e Intervalo**: El Cron Job corre cada **5 minutos** (`*/5 * * * *`) para sincronizar el estado y los goles en tiempo real de los encuentros en juego (`in_progress`).
-- **Eficiencia y Protección de Scores**: La Edge Function solo escribe los marcadores (`home_score`, `away_score`) la **primera vez** que un partido pasa a estado `finished`. En sincronizaciones posteriores, si la DB ya tiene scores, no los sobreescribe. Esto protege correcciones manuales ante datos incorrectos de la API (ej: bug de Zafronix reportando France 2-0 Senegal cuando fue 3-1). Para los nombres de equipos en fase de grupos, solo se actualizan si estaban en `TBD` o `Por Definir`, evitando corrupción de datos del seed.
-- **Flujo**: La Edge Function consulta los partidos y las tablas de posiciones (standings), y actualiza las tablas `matches` y `group_standings` en PostgreSQL. Cuando un partido pasa a estado `finished`, el trigger automático se encarga de calcular los puntajes de los pronósticos de los usuarios.
+- **Eficiencia y Protección de Scores**: La Edge Function solo escribe los marcadores (`home_score`, `away_score`) la **primera vez** que un partido pasa a estado `finished`. En sincronizaciones posteriores, si la DB ya tiene scores, no los sobreescribe. Esto protege correcciones manuales ante datos incorrectos de la API.
+- **Override Manual**: Los partidos con `manual_override = true` son ignorados completamente por el sync, permitiendo gestionar resultados de forma independiente cuando la API falla (común en fase de eliminatorias).
+- **Propagación Automática de Bracket**: Cuando un partido de eliminatorias pasa a `finished`, un trigger PostgreSQL (`propagate_knockout_winner`) reemplaza automáticamente los placeholders `W{N}` y `L{N}` en rondas posteriores con el ganador/perdedor correspondiente. Para empates por penales, se usa la columna `penalty_winner`.
+- **Flujo**: La Edge Function consulta los partidos y las tablas de posiciones (standings), y actualiza las tablas `matches` y `group_standings` en PostgreSQL. Cuando un partido pasa a estado `finished`, los triggers automáticos calculan puntajes y propagan ganadores.
 - **Mitigación de Fuga de Datos (OWASP A10)**: Los errores producidos en la sincronización se envuelven y los logs detallados quedan exclusivamente en el servidor de Supabase. El cliente recibe un error genérico, ocultando los detalles de la base de datos a posibles atacantes.
 
 ## Estructura del Frontend
