@@ -14,6 +14,7 @@ interface ZafronixMatch {
   id: string
   date: string
   kickoff: string
+  kickoffUtc?: string
   stage: string
   homeTeam: string | null
   awayTeam: string | null
@@ -94,7 +95,7 @@ serve(async (_req: Request) => {
       // Get db matches
       const { data: dbMatches, error: dbError } = await supabase
         .from('matches')
-        .select('id, match_number, status, home_team, away_team, home_score, away_score, manual_override')
+        .select('id, match_number, status, home_team, away_team, home_score, away_score, manual_override, kickoff_time')
 
       if (dbError) throw dbError
 
@@ -149,6 +150,16 @@ serve(async (_req: Request) => {
         if (newStatus !== dbMatch.status) {
           updatePayload.status = newStatus
           shouldUpdate = true
+        }
+
+        // Sincronizar kickoff_time si es diferente
+        if (apiMatch.kickoffUtc && dbMatch.kickoff_time) {
+          const apiTime = new Date(apiMatch.kickoffUtc).getTime()
+          const dbTime = new Date(dbMatch.kickoff_time).getTime()
+          if (apiTime !== dbTime) {
+            updatePayload.kickoff_time = apiMatch.kickoffUtc
+            shouldUpdate = true
+          }
         }
 
         // Solo escribimos scores si la DB no tiene todavía (primera vez que termina).
