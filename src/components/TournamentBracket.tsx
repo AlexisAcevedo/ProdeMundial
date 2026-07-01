@@ -269,18 +269,18 @@ export function TournamentBracket({
                   {/* Sends to right (R32, R16, QF) */}
                   {colIdx < 3 ? (
                     <>
-                      <div className="absolute right-0 top-1/2 hidden h-px w-2 translate-x-full bg-brand-500 dark:bg-brand-400 lg:block" />
-                      <div className={`absolute right-[-8px] hidden w-px bg-brand-500 dark:bg-brand-400 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
+                      <div className="absolute right-0 top-1/2 hidden h-[2px] w-2 translate-x-full bg-brand-500 dark:bg-brand-400 lg:block" />
+                      <div className={`absolute right-[-8px] hidden w-[2px] bg-brand-500 dark:bg-brand-400 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
                     </>
                   ) : (
                     // SF sends to Final
-                    <div className="absolute right-0 top-1/2 hidden h-px w-6 -translate-y-1/2 translate-x-full bg-gradient-to-r from-brand-500 to-amber-500 lg:block">
-                      <div className="absolute right-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                    <div className="absolute right-0 top-1/2 hidden h-[2px] w-6 -translate-y-1/2 translate-x-full bg-gradient-to-r from-brand-500 to-amber-500 lg:block">
+                      <div className="absolute right-0 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
                     </div>
                   )}
                   {/* Receives from left (R16, QF, SF) */}
                   {colIdx > 0 && (
-                    <div className="absolute left-0 top-1/2 hidden h-px w-2 -translate-x-full bg-brand-500 dark:bg-brand-400 lg:block" />
+                    <div className="absolute left-0 top-1/2 hidden h-[2px] w-2 -translate-x-full bg-brand-500 dark:bg-brand-400 lg:block" />
                   )}
                 </div>
                 );
@@ -368,18 +368,18 @@ export function TournamentBracket({
                   {/* Sends to left (R32, R16, QF) */}
                   {colIdx > 0 ? (
                     <>
-                      <div className="absolute left-0 top-1/2 hidden h-px w-2 -translate-x-full bg-brand-500 dark:bg-brand-400 lg:block" />
-                      <div className={`absolute left-[-8px] hidden w-px bg-brand-500 dark:bg-brand-400 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
+                      <div className="absolute left-0 top-1/2 hidden h-[2px] w-2 -translate-x-full bg-brand-500 dark:bg-brand-400 lg:block" />
+                      <div className={`absolute left-[-8px] hidden w-[2px] bg-brand-500 dark:bg-brand-400 lg:block ${isTop ? 'top-1/2 bottom-0' : 'top-0 bottom-1/2'}`} />
                     </>
                   ) : (
                     // SF sends to Final
-                    <div className="absolute left-0 top-1/2 hidden h-px w-6 -translate-y-1/2 -translate-x-full bg-gradient-to-l from-brand-500 to-amber-500 lg:block">
-                      <div className="absolute left-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                    <div className="absolute left-0 top-1/2 hidden h-[2px] w-6 -translate-y-1/2 -translate-x-full bg-gradient-to-l from-brand-500 to-amber-500 lg:block">
+                      <div className="absolute left-0 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-amber-500/80 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
                     </div>
                   )}
                   {/* Receives from right (R16, QF, SF) */}
                   {colIdx < 3 && (
-                    <div className="absolute right-0 top-1/2 hidden h-px w-2 translate-x-full bg-brand-500 dark:bg-brand-400 lg:block" />
+                    <div className="absolute right-0 top-1/2 hidden h-[2px] w-2 translate-x-full bg-brand-500 dark:bg-brand-400 lg:block" />
                   )}
                 </div>
                 );
