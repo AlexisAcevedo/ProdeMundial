@@ -162,10 +162,12 @@ serve(async (_req: Request) => {
           }
         }
 
-        // Solo escribimos scores si la DB no tiene todavía (primera vez que termina).
-        // Esto protege correcciones manuales cuando la API tiene datos incorrectos.
-        const dbHasScores = dbMatch.home_score !== null && dbMatch.away_score !== null
-        if (newStatus === 'finished' && !dbHasScores) {
+        // Actualizamos scores si la API trae un valor distinto al de la BD.
+        // manual_override = true es la protección explícita para no pisar un partido corregido a mano.
+        const scoresChanged =
+          apiMatch.homeScore !== dbMatch.home_score ||
+          apiMatch.awayScore !== dbMatch.away_score
+        if (newStatus === 'finished' && scoresChanged && apiMatch.homeScore !== null && apiMatch.awayScore !== null) {
           updatePayload.home_score = apiMatch.homeScore
           updatePayload.away_score = apiMatch.awayScore
           shouldUpdate = true
@@ -212,6 +214,63 @@ serve(async (_req: Request) => {
       if (skippedOverrides > 0) {
         log.push(`⏸ ${skippedOverrides} partidos con override manual ignorados.`)
       }
+
+      // ════════════════════════════════════════════════════════════════════════
+      // PASO 1.5: Propagar ganadores al bracket siguiente
+      // Resuelve placeholders W{n} / L{n} en partidos pendientes usando los
+      // resultados ya confirmados (con o sin manual_override).
+      // Solo actúa cuando hay un ganador claro (no empate en 90').
+      // ════════════════════════════════════════════════════════════════════════
+      log.push("▶ Propagando ganadores al bracket...")
+
+      // Construir mapa { match_number → { winner, loser } } con partidos terminados
+      const winnerMap = new Map<number, { winner: string; loser: string }>()
+      for (const m of (dbMatches ?? [])) {
+        if (m.status !== 'finished') continue
+        if (m.home_score === null || m.away_score === null) continue
+        if (m.home_score === m.away_score) continue // empate sin ganador claro (penales pendientes)
+        const homeWins = m.home_score > m.away_score
+        winnerMap.set(m.match_number, {
+          winner: homeWins ? m.home_team : m.away_team,
+          loser:  homeWins ? m.away_team : m.home_team,
+        })
+      }
+
+      // Buscar partidos pendientes que aún tienen placeholders W{n} o L{n}
+      const { data: pendingMatches, error: pendingError } = await supabase
+        .from('matches')
+        .select('id, match_number, home_team, away_team')
+        .eq('status', 'pending')
+
+      if (pendingError) throw pendingError
+
+      let propagated = 0
+      for (const pending of (pendingMatches ?? [])) {
+        const propagatePayload: Record<string, string> = {}
+
+        for (const side of ['home_team', 'away_team'] as const) {
+          const placeholder = pending[side] as string | null
+          const ref = placeholder?.match(/^([WL])(\d+)$/)
+          if (!ref) continue
+          const entry = winnerMap.get(parseInt(ref[2], 10))
+          if (!entry) continue
+          const resolved = ref[1] === 'W' ? entry.winner : entry.loser
+          if (resolved && resolved !== placeholder) {
+            propagatePayload[side] = resolved
+          }
+        }
+
+        if (Object.keys(propagatePayload).length > 0) {
+          const { error: propError } = await supabase
+            .from('matches')
+            .update(propagatePayload)
+            .eq('id', pending.id)
+          if (propError) log.push(`⚠ Error propagando partido ${pending.match_number}: ${propError.message}`)
+          else propagated++
+        }
+      }
+
+      log.push(`✓ ${propagated} propagaciones de ganador al bracket.`)
     }
 
     // ══════════════════════════════════════════════════════════════════════════
